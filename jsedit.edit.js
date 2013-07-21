@@ -261,14 +261,14 @@
                 }
                 //if(self.element.get(0).tagName.toUpperCase()==='SPAN' && self.element.text()===''){
                 if(self.element.text()==='' && self.element.attr("contenteditable")==="true"){
-                    self.element.focus();
+                    
                     self.element.text(self.element.get(0).tagName.toLowerCase());
                     selectText(self.element.get(0));
                     //var sel = window.getSelection();
                     //var range = sel.getRangeAt(0);
                     //var range = document.createRange();
                     //range.selectNodeContents(self.element.get(0));                   
-                    
+                    self.element.focus();
                     //setTimeout(function(){
                     //    self.element.text("");
                     //},0);
