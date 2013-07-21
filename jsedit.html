@@ -2,36 +2,32 @@
 <html xmlns:hx="http://purl.org/NET/hinclude">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- <link rel="stylesheet/less" type="text/css" href="jsedit.less"> -->
+<LINK href="lib/css/jquery.contextMenu.css" rel="stylesheet" type="text/css">
+<LINK href="lib/css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" type="text/css">
+
+  <!-- <script src="lib/less.js" type="text/javascript"></script> -->
 <script src="lib/jquery-1.8.0.min.js" type="text/javascript"></script>
 <script src="lib/jquery.contextMenu.js" type="text/javascript"></script>
 <script src="lib/jquery-ui-1.8.23.custom.min.js" type="text/javascript"></script>
 <script src="jsedit.core.js"></script>
 <script src="jsedit.commands.js"></script>
-
-
-<LINK href="lib/css/jquery.contextMenu.css" rel="stylesheet" type="text/css">
-<LINK href="lib/css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" type="text/css">
-<LINK href="jsedit.css" rel="stylesheet" type="text/css">
-
+<script src="jsedit.bindings.js"></script>
+<link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> 
 <title>JSEdit</title>
 
 </head>
 
-<body>
-
-<!-- <input size=80 id="command" tabindex=8  contenteditable="true" type="text" name="b" autocomplete="true"></input> -->
-
-<!-- <div id="toolbar"></div> -->
-
-<!-- <div id="content"> -->
-<!-- <div tabindex=1 contenteditable=true>text</div> -->
-<!-- </div> -->
+<body style='padding-top:50px'>
 
 
 <script src="jsedit.edit.js"></script>
 <script>
 jsedit.edit.editor("body");
-</script> 
+  
+</script>
+<script src="lib/bootstrap/js/bootstrap.min.js"></script> 
 </body>
 </html>
