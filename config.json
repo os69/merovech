@@ -1,6 +1,6 @@
 { 
-   address : "192.168.0.100",
-   port    : 51000,
+   address : "wdfd00276297a",
+   port    : 50000,
    loadPaths : ["."],
    savePath : "."
 }

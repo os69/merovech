@@ -89,7 +89,7 @@
             });
 
             // toolbar status field
-            this.status = $("<span class='status' style='margin-right:10px;width:50px' ></span>");
+            this.status = $("<span class='' style='width:200px;float:left;margin-top:10px'>DIV</span>");
             this.toolbar.append(this.status);
 
             // toolbar buttons
@@ -135,6 +135,9 @@
                 container.append(groupContainer);
                 $.each(group.bindings,function(){
                     var commandBinding = this;
+                    if(commandBinding.button !== undefined && ! commandBinding.button){
+                        return;
+                    }
                     var button = $("<button class='btn'>" + commandBinding.commandClass.prototype.name + "</button>");
                     if(commandBinding.keyLabel){
                         button.attr("title","Control+"+commandBinding.keyLabel);
@@ -438,7 +441,7 @@
                 // alert("ok");
             });
             core.url().parameter("page", pageName).submit();
-            $(".jse-content").focus();
+            //$(".jse-content").focus();
         },
 
         // --------------------------------------------------------------------

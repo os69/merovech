@@ -205,7 +205,7 @@
     // =========================================================================
     module.DeleteCommand = module.defineCommand({
 
-        name : 'delete',
+        name : 'del',
 
         execute : function() {
             var newElement = this.element.next();
@@ -406,7 +406,7 @@
     // =========================================================================
     module.ImageCommand = module.defineCommand({
 
-        name : 'image',
+        name : 'img',
 
         execute : function() {
             this.insertElement = $("<img  class='jsimg'  tabindex=1 src=" + this.url + " width='" + this.size + "px'></img>");

@@ -19,18 +19,22 @@
         bindings : [{
             key : 38,
             keyLabel : 'CursorLeft',
+            button : false,
             commandClass : commands.PrevCommand
         }, {
             key : 40,
             keyLabel : 'CursorRight',
+            button : false,
             commandClass : commands.NextCommand
         }, {
             key : 39,
             keyLabel : 'CursorUp',
+            button : false,
             commandClass : commands.FirstChildCommand
         }, {
             key : 37,
             keyLabel : 'CursorDown',
+            button : false,
             commandClass : commands.ParentCommand
         }, {
             key : 'c'.charCodeAt(0),
@@ -67,6 +71,7 @@
                 return new this.commandClass(context);
             }
         }, {
+            button : false,
             commandClass : commands.StaticCommand
         } ]
     }, {
@@ -74,10 +79,13 @@
         label : 'Container',
         // ---------------------------------------------------------------------
         bindings : [ {
+            button : false,
             commandClass : commands.TableCommand
         }, {
+            button : false,
             commandClass : commands.TableRowCommand
         }, {
+            button : false,
             commandClass : commands.TableDataCommand
         }, {
             key : 'u'.charCodeAt(0),
@@ -98,6 +106,7 @@
         }, {
             commandClass : commands.H2Command
         }, {
+            button : false,
             commandClass : commands.H3Command
         }, {
             commandClass : commands.DivCommand
