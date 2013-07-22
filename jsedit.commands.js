@@ -104,12 +104,12 @@
     module.TableCommand = module.defineInsertCommand("table", "<table tabindex=1><tbody tabindex=1><tr tabindex=1><td tabindex=1><span tabindex=1 contenteditable='true'></span></td></tr></tbody></table>");
     module.TableRowCommand = module.defineInsertCommand("tr", "<tr tabindex=1><td tabindex=1><span tabindex=1 contenteditable='true'></span></td></tr>");
     module.TableDataCommand = module.defineInsertCommand("td", "<td tabindex=1><span tabindex=1 contenteditable='true'></span></td>");
+    module.PreCommand = module.defineInsertCommand("pre", "<pre tabindex=1><span tabindex=1 contenteditable='true'></span></pre>");
     
     // leaf element directly contenteditable
     module.H1Command = module.defineInsertCommand("h1", "<h1 tabindex=1 contenteditable='true'></h1>");
     module.H2Command = module.defineInsertCommand("h2", "<h2 tabindex=1 contenteditable='true'></h2>");
-    module.H3Command = module.defineInsertCommand("h3", "<h3 tabindex=1 contenteditable='true'></h3>");
-    module.PreCommand = module.defineInsertCommand("pre", "<pre tabindex=1 contenteditable='true'></pre>");        
+    module.H3Command = module.defineInsertCommand("h3", "<h3 tabindex=1 contenteditable='true'></h3>");        
     module.SpanCommand = module.defineInsertCommand("span", "<span tabindex=1 contenteditable='true'></span>");
     module.BoldCommand = module.defineInsertCommand("bold", "<b tabindex=1 contenteditable='true'></b>");
     

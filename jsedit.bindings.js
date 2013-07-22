@@ -88,6 +88,10 @@
             button : false,
             commandClass : commands.TableDataCommand
         }, {
+            commandClass : commands.DivCommand
+        }, {
+            commandClass : commands.PreCommand
+        },{
             key : 'u'.charCodeAt(0),
             commandClass : commands.UnOrderedListCommand
         }, {
@@ -109,11 +113,7 @@
             button : false,
             commandClass : commands.H3Command
         }, {
-            commandClass : commands.DivCommand
-        },{
             commandClass : commands.SpanCommand
-        }, {
-            commandClass : commands.PreCommand
         }, {
             commandClass : commands.BoldCommand
         }, {
