@@ -15,6 +15,8 @@
     var commands = global.jsedit.commands;
     var module = commands;
 
+    module.editableElement = "<span tabindex=1 contenteditable='true'></span>";
+    
     // =========================================================================
     // base class commands
     // =========================================================================
@@ -98,21 +100,85 @@
     // =========================================================================
     
     // container elements not directly contentediable
-    module.OrderedListCommand = module.defineInsertCommand("ol", "<ol tabindex=1><li tabindex=1><span tabindex=1 contenteditable='true'></span></li></ol>");
-    module.UnOrderedListCommand = module.defineInsertCommand("ul", "<ul tabindex=1><li tabindex=1><span tabindex=1 contenteditable='true'></span></li></ul>");
-    module.DivCommand = module.defineInsertCommand("div", "<div tabindex=1><span tabindex=1 contenteditable='true'></span></div>");
-    module.TableCommand = module.defineInsertCommand("table", "<table tabindex=1><tbody tabindex=1><tr tabindex=1><td tabindex=1><span tabindex=1 contenteditable='true'></span></td></tr></tbody></table>");
-    module.TableRowCommand = module.defineInsertCommand("tr", "<tr tabindex=1><td tabindex=1><span tabindex=1 contenteditable='true'></span></td></tr>");
-    module.TableDataCommand = module.defineInsertCommand("td", "<td tabindex=1><span tabindex=1 contenteditable='true'></span></td>");
-    module.PreCommand = module.defineInsertCommand("pre", "<pre tabindex=1><span tabindex=1 contenteditable='true'></span></pre>");
+    module.UnOrderedListCommand = module.defineInsertCommand("ul", "<ul tabindex=1><li tabindex=1>"+module.editableElement+"</li></ul>");
+    module.OrderedListCommand = module.defineInsertCommand("ol", "<ol tabindex=1><li tabindex=1>"+module.editableElement+"</li></ol>");
+    module.DivCommand = module.defineInsertCommand("div", "<div tabindex=1>"+module.editableElement+"</div>");
+    module.PreCommand = module.defineInsertCommand("pre", "<pre tabindex=1>"+module.editableElement+"</pre>");
+    module.TableCommand = module.defineInsertCommand("table", "<table tabindex=1><tbody tabindex=1><tr tabindex=1><td tabindex=1>"+module.editableElement+"</td></tr></tbody></table>");
+    module.TableRowCommand = module.defineInsertCommand("tr", "<tr tabindex=1><td tabindex=1>"+module.editableElement+"</td></tr>");
+    module.TableDataCommand = module.defineInsertCommand("td", "<td tabindex=1>"+module.editableElement+"</td>");
+    
     
     // leaf element directly contenteditable
-    module.H1Command = module.defineInsertCommand("h1", "<h1 tabindex=1 contenteditable='true'></h1>");
-    module.H2Command = module.defineInsertCommand("h2", "<h2 tabindex=1 contenteditable='true'></h2>");
-    module.H3Command = module.defineInsertCommand("h3", "<h3 tabindex=1 contenteditable='true'></h3>");        
-    module.SpanCommand = module.defineInsertCommand("span", "<span tabindex=1 contenteditable='true'></span>");
-    module.BoldCommand = module.defineInsertCommand("bold", "<b tabindex=1 contenteditable='true'></b>");
+    module.H1Command = module.defineInsertCommand("h1", "<h1 tabindex=1>"+module.editableElement+"</h1>");
+    module.H2Command = module.defineInsertCommand("h2", "<h2 tabindex=1>"+module.editableElement+"</h2>");
+    module.H3Command = module.defineInsertCommand("h3", "<h3 tabindex=1>"+module.editableElement+"</h3>");        
+    module.TextCommand = module.defineInsertCommand("text", module.editableElement);
+    module.BoldCommand = module.defineInsertCommand("b", "<b tabindex=1>"+module.editableElement+"</b>");
     
+    //module.TextSpanCommand = module.defineInsertCommand("span", "<span tabindex=1 contenteditable='true'></span>");
+    //module.SpanCommand = module.defineInsertCommand("span", "<span tabindex=1 contenteditable='true'></span>");
+    //module.BoldCommand = module.defineInsertCommand("bold", "<b tabindex=1 contenteditable='true'></b>");
+
+    // =========================================================================
+    // item
+    // =========================================================================
+    module.ItemCommand = module.defineCommand({
+
+        name : 'item',
+
+        execute : function() {
+            this.insertElement = $("<li tabindex=1></li>");
+            var text = $(module.editableElement);
+            this.insertElement.append(text);
+            this.editor.findSibling(this.element, "li").after(this.insertElement);
+            this.editor.assignHandlers(this.insertElement);
+            this.editor.setElement(text);
+        },
+
+        undo : undoInsertion
+    });
+
+
+    // =========================================================================
+    // image
+    // =========================================================================
+    module.ImageCommand = module.defineCommand({
+
+        name : 'img',
+
+        execute : function() {
+            this.insertElement = $("<img  tabindex=1 src=" + this.url + " width='" + this.size + "px'></img>");            
+            this.element.after(this.insertElement);
+            this.editor.assignHandlers(this.insertElement);
+            this.editor.setElement(this.insertElement);
+        },
+
+        undo : undoInsertion
+    });
+
+    // =========================================================================
+    // link
+    // =========================================================================
+    module.LinkCommand = module.defineCommand({
+
+        name : 'link',
+
+        execute : function() {
+            var url = "http://" + location.host + location.pathname + "?page=" + this.pageName;
+            this.insertElement = $("<a tabindex=1 href='"+url+"'></a>");
+            var text = $(module.editableElement);
+            this.insertElement.append(text);
+            this.element.after(this.insertElement);
+            this.editor.assignHandlers(this.insertElement);
+            this.editor.setElement(text);
+            //document.execCommand("createLink", false, url);
+        },
+        
+        undo : undoInsertion
+    });
+
+
 
     // =========================================================================
     // undo
@@ -381,56 +447,5 @@
         }
     });
 
-    // =========================================================================
-    // item
-    // =========================================================================
-    module.ItemCommand = module.defineCommand({
-
-        name : 'item',
-
-        execute : function() {
-            this.insertElement = $("<li tabindex=1></li>");
-            this.editor.assignHandlers(this.insertElement);
-            var text = $("<span tabindex=1 contenteditable='true'></span>");
-            this.editor.assignHandlers(text);
-            this.insertElement.append(text);
-            this.editor.findSibling(this.element, "li").after(this.insertElement);
-            this.editor.setElement(text);
-        },
-
-        undo : undoInsertion
-    });
-
-    // =========================================================================
-    // image
-    // =========================================================================
-    module.ImageCommand = module.defineCommand({
-
-        name : 'img',
-
-        execute : function() {
-            this.insertElement = $("<img  class='jsimg'  tabindex=1 src=" + this.url + " width='" + this.size + "px'></img>");
-            this.editor.assignHandlers(this.insertElement);
-            this.element.after(this.insertElement);
-            this.editor.setElement(this.insertElement);
-        },
-
-        undo : undoInsertion
-    });
-
-    // =========================================================================
-    // link
-    // =========================================================================
-    module.LinkCommand = module.defineCommand({
-
-        name : 'link',
-
-        execute : function() {
-            var url = "http://" + location.host + location.pathname + "?page=" + this.pageName;
-            this.editor.restoreSelection();
-            document.execCommand("CreateLink", false, url);
-            this.editor.assignHandlers(this.element);
-        }
-    });
 
 }(this));

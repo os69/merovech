@@ -16,7 +16,7 @@
         // ---------------------------------------------------------------------
         label : 'Tools',
         // ---------------------------------------------------------------------
-        bindings : [{
+        bindings : [ {
             key : 38,
             keyLabel : 'CursorLeft',
             button : false,
@@ -45,7 +45,7 @@
         }, {
             key : 'x'.charCodeAt(0),
             commandClass : commands.CutCommand
-        },  {
+        }, {
             commandClass : commands.UnCutCommand
         }, {
             key : 'd'.charCodeAt(0),
@@ -75,23 +75,10 @@
             commandClass : commands.StaticCommand
         } ]
     }, {
-        // ---------------------------------------------------------------------        
+        // ---------------------------------------------------------------------
         label : 'Container',
         // ---------------------------------------------------------------------
         bindings : [ {
-            button : false,
-            commandClass : commands.TableCommand
-        }, {
-            button : false,
-            commandClass : commands.TableRowCommand
-        }, {
-            button : false,
-            commandClass : commands.TableDataCommand
-        }, {
-            commandClass : commands.DivCommand
-        }, {
-            commandClass : commands.PreCommand
-        },{
             key : 'u'.charCodeAt(0),
             commandClass : commands.UnOrderedListCommand
         }, {
@@ -100,12 +87,25 @@
         }, {
             key : 'i'.charCodeAt(0),
             commandClass : commands.ItemCommand
+        }, {
+            commandClass : commands.DivCommand
+        }, {
+            commandClass : commands.PreCommand
+        }, {
+            button : false,
+            commandClass : commands.TableCommand
+        }, {
+            button : false,
+            commandClass : commands.TableRowCommand
+        }, {
+            button : false,
+            commandClass : commands.TableDataCommand
         } ]
     }, {
         // ---------------------------------------------------------------------
         label : 'Simple',
         // ---------------------------------------------------------------------
-        bindings : [  {
+        bindings : [ {
             commandClass : commands.H1Command
         }, {
             commandClass : commands.H2Command
@@ -113,20 +113,10 @@
             button : false,
             commandClass : commands.H3Command
         }, {
-            commandClass : commands.SpanCommand
-        }, {
-            commandClass : commands.BoldCommand
-        }, {
-            commandClass : commands.LinkCommand,
-            createCommandFromParameters : function(context, parameters) {
-                if (parameters.length >= 1) {
-                    context.pageName = parameters[0];
-                }
-                return new this.commandClass(context);
-            }
+            commandClass : commands.TextCommand
         }, {
             commandClass : commands.ImageCommand,
-            template : 'image <size> <name>',
+            template : 'img <size> <name>',
             createCommandFromParameters : function(context, parameters) {
                 if (parameters.length >= 1) {
                     context.size = parameters[0];
@@ -137,15 +127,30 @@
                 return new this.commandClass(context);
             }
         } ]
+    }, {
+        label : 'Inline',
+        bindings : [ {
+            commandClass : commands.LinkCommand,
+            template : 'link <pagename>',
+            createCommandFromParameters : function(context, parameters) {
+                if (parameters.length >= 1) {
+                    context.pageName = parameters[0];
+                }
+                return new this.commandClass(context);
+            }
+        }, {
+            key : 'b'.charCodeAt(0),
+            commandClass : commands.BoldCommand
+        } ]
     }
 
     ];
-    
-    module.commandBindingsList = (function(){
+
+    module.commandBindingsList = (function() {
         var list = [];
-        for(var i=0;i<module.commandBindings.length;++i){
+        for ( var i = 0; i < module.commandBindings.length; ++i) {
             var group = module.commandBindings[i];
-            for(var j=0;j<group.bindings.length;++j){
+            for ( var j = 0; j < group.bindings.length; ++j) {
                 var binding = group.bindings[j];
                 list.push(binding);
             }

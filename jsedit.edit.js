@@ -26,7 +26,6 @@
         return binding.commandClass.prototype.name;
     });
 
-
     // =========================================================================
     // editor
     // =========================================================================
@@ -40,20 +39,20 @@
             // create container
             var self = this;
             this.container = $(parent);
-            
+
             // create navbar
             this.navbar = $("<div class='navbar navbar-fixed-top'></div>");
             this.container.append(this.navbar);
             this.toolbar = $("<div class='navbar-inner'></div>");
             this.navbar.append(this.toolbar);
-           
+
             // create brand
             this.toolbar.append('<a class="brand" href="#">Merovech</a>');
-            
+
             // create form for in command and css input field
             this.inputForm = $('<form class="navbar-form pull-left" style="margin-right:10px"></form>');
             this.toolbar.append(this.inputForm);
-            
+
             // create command input field
             this.command = $("<input class='span2' type='text' style='margin-right:10px'></input>");
             this.inputForm.append(this.command);
@@ -80,8 +79,8 @@
                 switch (event.keyCode) {
                 case 13:
                     event.preventDefault();
-                    var cssClasses=self.cssStatus.val();
-                    self.element.attr("class",cssClasses);
+                    var cssClasses = self.cssStatus.val();
+                    self.element.attr("class", cssClasses);
                     break;
                 case 27:
                     break;
@@ -133,20 +132,21 @@
                 var group = this;
                 var groupContainer = $("<div class='btn-group'></div>");
                 container.append(groupContainer);
-                $.each(group.bindings,function(){
+                $.each(group.bindings, function() {
                     var commandBinding = this;
-                    if(commandBinding.button !== undefined && ! commandBinding.button){
+                    if (commandBinding.button !== undefined && !commandBinding.button) {
                         return;
                     }
                     var button = $("<button class='btn'>" + commandBinding.commandClass.prototype.name + "</button>");
-                    if(commandBinding.keyLabel){
-                        button.attr("title","Control+"+commandBinding.keyLabel);
-                    }else if(commandBinding.key){
-                        button.attr("title","Control+"+String.fromCharCode(commandBinding.key).toUpperCase());
+                    if (commandBinding.keyLabel) {
+                        button.attr("title", "Control+" + commandBinding.keyLabel);
+                    } else if (commandBinding.key) {
+                        button.attr("title", "Control+" + String.fromCharCode(commandBinding.key).toUpperCase());
                     }
                     groupContainer.append(button);
                     button.click(function() {
                         if (commandBinding.template) {
+                            self.executeCommandLineInit();
                             self.command.val(commandBinding.template);
                         } else {
                             var command = new commandBinding.commandClass(self.createContext());
@@ -241,30 +241,30 @@
             this.commandStack.push(command);
             command.execute();
         },
-        
+
         // ---------------------------------------------------------------------
         // set current focus element
         // ---------------------------------------------------------------------
         setElement : function(element) {
             var self = this;
-            
+
             if (element && element.length > 0) {
                 self.element = element;
                 self.status.text(self.getPath());
                 self.cssStatus.val(self.getCss());
             }
-            
-            if(self.element.length>0){
-                
+
+            if (self.element.length > 0) {
+
                 self.element.focus();
-                if(self.element.get(0).tagName==='IMG'){
-                    self.element.one('load',function(){
+                if (self.element.get(0).tagName === 'IMG') {
+                    self.element.one('load', function() {
                         self.element.focus();
                     });
                 }
                 //if(self.element.get(0).tagName.toUpperCase()==='SPAN' && self.element.text()===''){
-                if(self.element.text()==='' && self.element.attr("contenteditable")==="true"){
-                    
+                if (self.element.text() === '' && self.element.attr("contenteditable") === "true") {
+
                     self.element.text(self.element.get(0).tagName.toLowerCase());
                     selectText(self.element.get(0));
                     //var sel = window.getSelection();
@@ -277,16 +277,16 @@
                     //},0);
                 }
             }
-           
+
         },
 
         // ---------------------------------------------------------------------
         // get css classes of focus element
         // ---------------------------------------------------------------------
-        getCss : function(){
+        getCss : function() {
             return this.element.attr("class");
         },
-        
+
         // ---------------------------------------------------------------------
         // get dom path of focus element
         // ---------------------------------------------------------------------
@@ -315,9 +315,9 @@
         executeCommandLineInit : function() {
             var self = this;
             //setTimeout(function(){
-                self.saveSelection();
-                self.command.focus();
-                self.command.val("");
+            self.saveSelection();
+            self.command.focus();
+            self.command.val("");
             //},0);
         },
 
@@ -360,18 +360,15 @@
                 this.autocompleteList.push(commandLine);
             }
 
+            // clear command line
+            self.command.focus();
+            self.command.val("");
 
-
-            //setTimeout(function(){
-                
-                // clear command line
-                self.command.focus();
-                self.command.val("");
-                
-                // and execute
-                self.executeCommand(command);
-                
-            //},0);
+            // resore selection
+            self.restoreSelection();
+            
+            // and execute
+            self.executeCommand(command);
 
         },
 
@@ -548,15 +545,14 @@
 
     function selectText(text) {
         var doc = document
-            
-            , range, selection
-        ;    
+
+        , range, selection;
         if (doc.body.createTextRange) { //ms
             range = doc.body.createTextRange();
             range.moveToElementText(text);
             range.select();
         } else if (window.getSelection) { //all others
-            selection = window.getSelection();        
+            selection = window.getSelection();
             range = doc.createRange();
             range.selectNodeContents(text);
             selection.removeAllRanges();
