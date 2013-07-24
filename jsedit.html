@@ -16,18 +16,19 @@
 <script src="jsedit.commands.js"></script>
 <script src="jsedit.bindings.js"></script>
 <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> 
+<script src="lib/tempo-2.0/tempo.js" type="text/javascript"></script>
+
 <title>JSEdit</title>
 
 </head>
 
 <body style='padding-top:90px'>
 
-
 <script src="jsedit.edit.js"></script>
-<script>
-jsedit.edit.editor("body");
-  
-</script>
-<script src="lib/bootstrap/js/bootstrap.min.js"></script> 
+<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+window.jsedit.edit.editor($("body"));
+</script> 
 </body>
 </html>

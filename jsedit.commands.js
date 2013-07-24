@@ -121,6 +121,45 @@
     //module.BoldCommand = module.defineInsertCommand("bold", "<b tabindex=1 contenteditable='true'></b>");
 
     // =========================================================================
+    // insertion base command
+    // =========================================================================
+    module.InsertBaseCommand = core.createDerivedClass(module.Command,{
+    
+        name : 'insertbasecommand',
+        
+        template : '<img src=<%=url%> width=<%=size%> />',
+        
+        getLeafNode : function(node) {
+            if (node.children().length === 0) {
+                return node;
+            }
+            return this.getLeafNode($(node.children().get(0)));
+        },
+
+        execute : function() {    
+            var insertElementString = core.tmpl(this.template,this);
+            this.insertElement = $(insertElementString);            
+            this.element.after(this.insertElement);
+            this.editor.assignHandlers(this.insertElement);
+            var leafNode = this.getLeafNode(this.insertElement);
+            this.editor.setElement(leafNode);
+        },
+        
+        undo : undoInsertion
+       
+    });
+
+    // =========================================================================
+    // h3
+    // =========================================================================
+    module.ImageCommand = core.createDerivedClass(module.InsertBaseCommand,{
+    
+        name : 'img',        
+        template : '<img tabindex=1 src="<%=url%>" width="<%=size%>" />'
+               
+    });
+
+    // =========================================================================
     // item
     // =========================================================================
     module.ItemCommand = module.defineCommand({
@@ -143,7 +182,7 @@
     // =========================================================================
     // image
     // =========================================================================
-    module.ImageCommand = module.defineCommand({
+    module.Image2Command = module.defineCommand({
 
         name : 'img',
 
