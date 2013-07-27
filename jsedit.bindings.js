@@ -80,13 +80,13 @@
         // ---------------------------------------------------------------------
         bindings : [ {
             key : 'u'.charCodeAt(0),
-            commandClass : commands.UnOrderedListCommand
+            commandClass : commands.UlCommand
         }, {
             key : 'o'.charCodeAt(0),
-            commandClass : commands.OrderedListCommand
+            commandClass : commands.OlCommand
         }, {
             key : 'i'.charCodeAt(0),
-            commandClass : commands.ItemCommand
+            commandClass : commands.LiCommand
         }, {
             commandClass : commands.DivCommand
         }, {
@@ -113,7 +113,7 @@
             button : false,
             commandClass : commands.H3Command
         }, {
-            commandClass : commands.TextCommand
+            commandClass : commands.SpanCommand
         }, {
             commandClass : commands.ImageCommand,
             template : 'img <size> <name>',

@@ -13,18 +13,7 @@
     global.jsedit.edit = {};
     var edit = global.jsedit.edit;
     var core = global.jsedit.core;
-    var bindings = global.jsedit.bindings;
-
-    // =========================================================================
-    // create maps for accessing bindings by key or by name
-    // =========================================================================
-    edit.commandBindingsKeyMap = core.map(bindings.commandBindingsList, function(binding) {
-        return binding.key;
-    });
-
-    edit.commandBindingsNameMap = core.map(bindings.commandBindingsList, function(binding) {
-        return binding.commandClass.prototype.name;
-    });
+    var commands = global.jsedit.commands;
 
     // =========================================================================
     // editor
@@ -83,6 +72,8 @@
                     self.element.attr("class", cssClasses);
                     break;
                 case 27:
+                    self.restoreSelection();
+                    self.element.focus();
                     break;
                 }
             });
@@ -128,34 +119,60 @@
             //var container = $("<div class='btn-toolbar'></div>");
             //toolbar.append(container);
             var container = toolbar;
-            $.each(bindings.commandBindings, function() {
-                var group = this;
-                var groupContainer = $("<div class='btn-group'></div>");
-                container.append(groupContainer);
-                $.each(group.bindings, function() {
-                    var commandBinding = this;
-                    if (commandBinding.button !== undefined && !commandBinding.button) {
-                        return;
-                    }
-                    var button = $("<button class='btn'>" + commandBinding.commandClass.prototype.name + "</button>");
-                    if (commandBinding.keyLabel) {
-                        button.attr("title", "Control+" + commandBinding.keyLabel);
-                    } else if (commandBinding.key) {
-                        button.attr("title", "Control+" + String.fromCharCode(commandBinding.key).toUpperCase());
-                    }
-                    groupContainer.append(button);
-                    button.click(function() {
-                        if (commandBinding.template) {
-                            self.executeCommandLineInit();
-                            self.command.val(commandBinding.template);
-                        } else {
-                            var command = new commandBinding.commandClass(self.createContext());
-                            self.executeCommand(command);
-                        }
-                    });
-
-                });
+            
+            var groups = {};
+            $.each(commands,function(key,commandClass){
+                if(!commandClass.prototype || !commandClass.prototype.button || !commandClass.prototype.buttonGroup){
+                    return;
+                }
+                var prot = commandClass.prototype;
+                var group = groups[prot.buttonGroup];
+                if(!group){
+                    group =  $("<div class='btn-group'></div>");
+                    groups[prot.buttonGroup] = group;
+                    container.append(group);
+                }
+                var button = $("<button class='btn'>" + prot.button + "</button>");
+                group.append(button);
+                button.click(function() {
+                  if (prot.commandTemplate) {
+                      self.executeCommandLineInit();
+                      self.command.val(prot.commandTemplate);
+                  } else {
+                      var command = new commandClass(self.createContext());
+                      self.executeCommand(command);
+                  }
+              });
+                
             });
+//            $.each(bindings.commandBindings, function() {
+//                var group = this;
+//                var groupContainer = $("<div class='btn-group'></div>");
+//                container.append(groupContainer);
+//                $.each(commands, function() {
+//                    var commandBinding = this;
+//                    if (commandBinding.button !== undefined && !commandBinding.button) {
+//                        return;
+//                    }
+//                    var button = $("<button class='btn'>" + commandBinding.commandClass.prototype.name + "</button>");
+//                    if (commandBinding.keyLabel) {
+//                        button.attr("title", "Control+" + commandBinding.keyLabel);
+//                    } else if (commandBinding.key) {
+//                        button.attr("title", "Control+" + String.fromCharCode(commandBinding.key).toUpperCase());
+//                    }
+//                    groupContainer.append(button);
+//                    button.click(function() {
+//                        if (commandBinding.template) {
+//                            self.executeCommandLineInit();
+//                            self.command.val(commandBinding.template);
+//                        } else {
+//                            var command = new commandBinding.commandClass(self.createContext());
+//                            self.executeCommand(command);
+//                        }
+//                    });
+//
+//                });
+//            });
         },
 
         // ---------------------------------------------------------------------
@@ -193,7 +210,7 @@
 
             event.stopPropagation();
 
-            if (event.ctrlKey && event.keyCode !== 17) {
+            if (event.altKey && event.keyCode !== 18) {
                 // 1 CTRL KEY
 
                 var key = null;
@@ -205,11 +222,11 @@
                 key = String.fromCharCode(key).toLowerCase().charCodeAt(0);
 
                 // new commands
-                var commandBinding = edit.commandBindingsKeyMap[key];
-                if (commandBinding) {
+                var commandClass = commands.commandByKey[key];
+                if (commandClass) {
 
                     // create command
-                    command = new commandBinding.commandClass(self.createContext());
+                    command = new commandClass(self.createContext());
 
                     // execute command
                     self.executeCommand(command);
@@ -338,8 +355,8 @@
             var commandName = parts[0];
 
             // get command binding
-            var commandBinding = edit.commandBindingsNameMap[commandName];
-            if (!commandBinding) {
+            var commandClass = commands.commandByName[commandName];
+            if (!commandClass) {
                 return;
             }
 
@@ -347,12 +364,9 @@
             var parameters = parts.slice(1);
 
             // create command
-            var context = self.createContext();
-            var command;
-            if (commandBinding.createCommandFromParameters) {
-                command = commandBinding.createCommandFromParameters(context, parameters);
-            } else {
-                command = new commandBinding.commandClass(context);
+            var command = new commandClass(self.createContext());
+            if (command.setParameters) {
+                command.setParameters(parameters);
             }
 
             // update history
