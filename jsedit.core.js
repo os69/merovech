@@ -4,7 +4,7 @@
     /*global window */
     /*global $  */
     /*global document */
-    
+
     // =========================================================================
     // packages
     // =========================================================================
@@ -134,19 +134,19 @@
     // =========================================================================
     // create map from list
     // =========================================================================
-    core.map = function(list,key){
+    core.map = function(list, key) {
         var map = {};
-        for(var i=0;i<list.length;++i){
+        for ( var i = 0; i < list.length; ++i) {
             var element = list[i];
-            var keyValue =  key(element);
-            if(!keyValue){
+            var keyValue = key(element);
+            if (!keyValue) {
                 continue;
             }
             map[keyValue] = element;
         }
         return map;
     };
-    
+
     // =========================================================================
     // url manager
     // =========================================================================
@@ -257,43 +257,194 @@
         }
     };
 
-        
-
+    // =========================================================================
     // Simple JavaScript Templating
     // John Resig - http://ejohn.org/ - MIT Licensed
-    (function(){
-      var cache = {};
-     
-      core.tmpl = function tmpl(str, data){
-        // Figure out if we're getting a template, or if we need to
-        // load the template - and be sure to cache the result.
-        var fn = !/\W/.test(str) ?
-          cache[str] = cache[str] ||
-            tmpl(document.getElementById(str).innerHTML) :
-         
-          // Generate a reusable function that will serve as a template
-          // generator (and which will be cached).
-          new Function("obj",
-            "var p=[],print=function(){p.push.apply(p,arguments);};" +
-           
-            // Introduce the data as local variables using with(){}
-            "with(obj){p.push('" +
-           
-            // Convert the template into pure JavaScript
-            str
-              .replace(/[\r\t\n]/g, " ")
-              .split("<%").join("\t")
-              .replace(/((^|%>)[^\t]*)'/g, "$1\r")
-              .replace(/\t=(.*?)%>/g, "',$1,'")
-              .split("\t").join("');")
-              .split("%>").join("p.push('")
-              .split("\r").join("\\'")
-          + "');}return p.join('');");
-       
-        // Provide some basic currying to the user
-        return data ? fn( data ) : fn;
-      };
+    // =========================================================================
+    (function() {
+        var cache = {};
+
+        core.tmpl = function tmpl(str, data) {
+            // Figure out if we're getting a template, or if we need to
+            // load the template - and be sure to cache the result.
+            var fn = !/\W/.test(str) ? cache[str] = cache[str] || tmpl(document.getElementById(str).innerHTML) :
+
+            // Generate a reusable function that will serve as a template
+            // generator (and which will be cached).
+            new Function("obj", "var p=[],print=function(){p.push.apply(p,arguments);};"
+                    +
+
+                    // Introduce the data as local variables using with(){}
+                    "with(obj){p.push('"
+                    +
+
+                    // Convert the template into pure JavaScript
+                    str.replace(/[\r\t\n]/g, " ").split("<%").join("\t").replace(/((^|%>)[^\t]*)'/g, "$1\r").replace(/\t=(.*?)%>/g, "',$1,'").split("\t").join("');").split("%>")
+                            .join("p.push('").split("\r").join("\\'") + "');}return p.join('');");
+
+            // Provide some basic currying to the user
+            return data ? fn(data) : fn;
+        };
     })();
 
+    // =========================================================================
+    // select text of dom node
+    // =========================================================================
+    core.selectText = function(node) {
+        var doc = document, range, selection;
+        if (doc.body.createTextRange) { // ms
+            range = doc.body.createTextRange();
+            range.moveToElementText(node);
+            range.select();
+        } else if (window.getSelection) { // all others
+            selection = window.getSelection();
+            range = doc.createRange();
+            range.selectNodeContents(node);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    };
+
+    // =========================================================================
+    // name/value dialog
+    // =========================================================================
+    core.nameValueDialog = function(options, callback) {
+
+        var oldFields = $.extend(true, [], options.fields);
+
+        // append title
+        var appendTitle = function(parentNode, field) {
+            parentNode.append("<td colspan=2><span class='nvtitle'>" + field.title + "</span></td>");
+        };
+
+        // append input field
+        var appendInputField = function(parentNode, field) {
+
+            var nameCell = $("<td></td>");
+            parentNode.append(nameCell);
+            field.nameInputField = $("<input type='text'/>");
+            field.nameInputField.val(field.name);
+            nameCell.append(field.nameInputField);
+
+            var valueCell = $("<td></td>");
+            parentNode.append(valueCell);
+            field.valueInputField = $("<input type='text'/>");
+            field.valueInputField.val(field.value);
+            valueCell.append(field.valueInputField);
+
+            var removeCell = $("<td></td>");
+            parentNode.append(removeCell);
+            var button = $("<button>Remove</button>");
+            button.click(function() {
+                parentNode.remove();
+                core.removeElements(options.fields, [ field ]);
+            });
+            removeCell.append(button);
+
+        };
+
+        // construct html of dialog
+        var content = $("<div></div>");
+        var table = $("<table style='margin-top:10px'></table>");
+        content.append(table);
+        for ( var i = 0; i < options.fields.length; ++i) {
+            var field = options.fields[i];
+            var row = $("<tr></tr>");
+            table.append(row);
+            if (field.title) {
+                appendTitle(row, field);
+            } else {
+                appendInputField(row, field);
+            }
+        }
+        var addButton = $("<button>Add</button>");
+        content.append(addButton);
+        addButton.click(function() {
+            var field = {
+                name : 'new',
+                value : 'value'
+            };
+            options.fields.push(field);
+            var row = $("<tr></tr>");
+            table.append(row);
+            appendInputField(row, field);
+        });
+
+        var calculateDelta = function(oldFields,newFields){
+            var delta = {
+              addedFields : [],
+              deletedFields : [],
+              changedFields : []
+            };
+            var oldMap = core.map(oldFields,function(field){
+                return field.name;
+            });
+            var newMap = core.map(newFields,function(field){
+                return field.name;
+            });
+            for(var i=0;i<newFields.length;++i){
+                var newField = newFields[i];
+                var oldField = oldMap[newField.name];
+                if(!oldField){
+                    delta.addedFields.push({ name  : newField.name,
+                                             value : newField.value});                    
+                }else{
+                    if(oldField.value!==newField.value){
+                        delta.changedFields.push({
+                            name     : newField.name,                          
+                            oldValue : oldField.value,
+                            newValue : newField.value
+                        });
+                    }
+                }                
+            }
+            for(var i=0;i<oldFields.length;++i){
+                var oldField = oldFields[i];
+                var newField = newMap[oldField.name];
+                if(!newField){
+                    delta.deletedFields.push({
+                        name : oldField.name,
+                        value: oldField.value
+                    });
+                }
+            }
+            return delta;
+        };
+        
+        // dialog widget
+        content.dialog({
+            buttons : [ {
+                text : "Ok",
+                click : function() {
+                    // close dialog
+                    $(this).dialog("close");
+                    // transfer values from input fields to object
+                    for ( var i = 0; i < options.fields.length; ++i) {
+                        var field = options.fields[i];
+                        field.name = field.nameInputField.val();
+                        field.value = field.valueInputField.val();
+                    }
+                    // delta
+                    var delta = calculateDelta(oldFields, options.fields);
+                    callback(delta);
+                }
+            } ],
+            title : options.title,
+            width : 600
+        });
+    };
+
+    // =========================================================================
+    // load stylesheet
+    // =========================================================================
+    core.loadStyleSheet = function(name){
+        var link = $("<link>");
+        link.attr({
+                type : 'text/css',
+                rel  : 'stylesheet',
+                href : name
+        });
+        $("head").append( link );       
+    };
 
 })(this);

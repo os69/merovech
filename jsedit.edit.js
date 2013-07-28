@@ -1,11 +1,11 @@
 (function(global) {
     "use strict";
 
-    /*global window */
-    /*global document */
-    /*global alert */
-    /*global $ */
-    /*global location */
+    /* global window */
+    /* global document */
+    /* global alert */
+    /* global $ */
+    /* global location */
 
     // =========================================================================
     // packages
@@ -25,82 +25,60 @@
         // ---------------------------------------------------------------------
         init : function(parent) {
 
-            // create container
+            // create main container
             var self = this;
-            this.container = $(parent);
+            this.containerDiv = $(parent);
 
             // create navbar
-            this.navbar = $("<div class='navbar navbar-fixed-top'></div>");
-            this.container.append(this.navbar);
-            this.toolbar = $("<div class='navbar-inner'></div>");
-            this.navbar.append(this.toolbar);
+            this.navbarDiv = $("<div class='navbar navbar-fixed-top'></div>");
+            this.containerDiv.append(this.navbarDiv);
+            this.toolbarDiv = $("<div class='navbar-inner'></div>");
+            this.navbarDiv.append(this.toolbarDiv);
 
             // create brand
-            this.toolbar.append('<a class="brand" href="#">Merovech</a>');
+            this.toolbarDiv.append('<a class="brand" href="#">Merovech</a>');
 
-            // create form for in command and css input field
+            // create form (for commands and css status field)
             this.inputForm = $('<form class="navbar-form pull-left" style="margin-right:10px"></form>');
-            this.toolbar.append(this.inputForm);
+            this.toolbarDiv.append(this.inputForm);
 
             // create command input field
-            this.command = $("<input class='span2' type='text' style='margin-right:10px'></input>");
-            this.inputForm.append(this.command);
-
-            // assign even handler for command input field
-            this.command.keydown(function(event) {
-                switch (event.keyCode) {
-                case 13:
-                    event.preventDefault();
-                    self.executeCommandLine();
-                    break;
-                case 27:
-                    self.restoreSelection();
-                    self.element.focus();
-                    break;
-                }
+            this.commandInput = $("<input class='span2' type='text' style='margin-right:10px'></input>");
+            this.inputForm.append(this.commandInput);
+            this.commandInput.keydown(function(event) {
+                self.handleCommandInputKey(event);
             });
-
-            // create css status field
-            this.cssStatus = $("<input class='span2' type='text'></input>");
-            this.inputForm.append(this.cssStatus);
-
-            this.cssStatus.keydown(function(event) {
-                switch (event.keyCode) {
-                case 13:
-                    event.preventDefault();
-                    var cssClasses = self.cssStatus.val();
-                    self.element.attr("class", cssClasses);
-                    break;
-                case 27:
-                    self.restoreSelection();
-                    self.element.focus();
-                    break;
-                }
-            });
-
-            // toolbar status field
-            this.status = $("<span class='' style='width:200px;float:left;margin-top:10px'>DIV</span>");
-            this.toolbar.append(this.status);
-
-            // toolbar buttons
-            this.createButtons(this.toolbar);
 
             // autocomplete for command input field
             this.autocompleteList = [];
-            this.command.autocomplete({
+            this.commandInput.autocomplete({
                 source : function() {
                     self.autocomplete.apply(self, arguments);
                 }
             });
 
+            // create css status field
+            this.cssInput = $("<input class='span2' type='text'></input>");
+            this.inputForm.append(this.cssInput);
+            this.cssInput.keydown(function(event) {
+                self.handleCssInputKey(event);
+            });
+
+            // toolbar status field
+            this.statusSpan = $("<span class='' style='width:200px;float:left;margin-top:10px'>DIV</span>");
+            this.toolbarDiv.append(this.statusSpan);
+
+            // toolbar buttons
+            this.createButtons(this.toolbarDiv);
+
             // create content
-            this.content = $("<div tabindex=1 class='jse-content container'></div>");
-            this.container.append(this.content);
-            this.content.append($("<h1 tabindex=1 contenteditable='true'>Heading1</h1>"));
+            this.contentDiv = $("<div tabindex=1 class='jse-content container'></div>");
+            this.containerDiv.append(this.contentDiv);
+            this.contentDiv.append($("<h1 tabindex=1 contenteditable='true'>Heading1</h1>"));
 
             // assign event handlers for all elements in content
             this.relevantElements = "ul, ol, li, div, pre, p, h1, h2, h3, input, img, table, tbody, tr, td, a, span, b";
-            this.assignHandlers(this.content);
+            this.assignHandlers(this.contentDiv);
 
             // load page
             var pageName = core.url().parameter("page");
@@ -108,7 +86,47 @@
                 self.loadPage(pageName);
             }
 
+            // command stack
             self.commandStack = [];
+            
+            // check for custom css
+            var css = core.url().parameter("css");
+            if(css){
+                core.loadStyleSheet(css);
+            }
+        },
+
+        // ---------------------------------------------------------------------
+        // key events command input
+        // ---------------------------------------------------------------------
+        handleCommandInputKey : function(event) {
+            var self = this;
+            switch (event.keyCode) {
+            case 13:
+                event.preventDefault();
+                self.executeCommandLine();
+                break;
+            case 27:
+                self.element.focus();
+                break;
+            }
+        },
+
+        // ---------------------------------------------------------------------
+        // key events css status field
+        // ---------------------------------------------------------------------
+        handleCssInputKey : function(event) {
+            var self = this;
+            switch (event.keyCode) {
+            case 13:
+                event.preventDefault();
+                var cssClasses = self.cssInput.val();
+                self.element.attr("class", cssClasses);
+                break;
+            case 27:
+                self.element.focus();
+                break;
+            }
         },
 
         // ---------------------------------------------------------------------
@@ -116,63 +134,34 @@
         // ---------------------------------------------------------------------
         createButtons : function(toolbar) {
             var self = this;
-            //var container = $("<div class='btn-toolbar'></div>");
-            //toolbar.append(container);
+            // var container = $("<div class='btn-toolbar'></div>");
+            // toolbar.append(container);
             var container = toolbar;
-            
             var groups = {};
-            $.each(commands,function(key,commandClass){
-                if(!commandClass.prototype || !commandClass.prototype.button || !commandClass.prototype.buttonGroup){
+            $.each(commands, function(key, commandClass) {
+                if (!commandClass.prototype || !commandClass.prototype.button || !commandClass.prototype.buttonGroup) {
                     return;
                 }
                 var prot = commandClass.prototype;
                 var group = groups[prot.buttonGroup];
-                if(!group){
-                    group =  $("<div class='btn-group'></div>");
+                if (!group) {
+                    group = $("<div class='btn-group'></div>");
                     groups[prot.buttonGroup] = group;
                     container.append(group);
                 }
                 var button = $("<button class='btn'>" + prot.button + "</button>");
                 group.append(button);
                 button.click(function() {
-                  if (prot.commandTemplate) {
-                      self.executeCommandLineInit();
-                      self.command.val(prot.commandTemplate);
-                  } else {
-                      var command = new commandClass(self.createContext());
-                      self.executeCommand(command);
-                  }
-              });
-                
+                    if (prot.commandTemplate) {
+                        self.executeCommandLineInit();
+                        self.commandInput.val(prot.commandTemplate);
+                    } else {
+                        var command = new commandClass(self.createContext());
+                        self.executeCommand(command);
+                    }
+                });
+
             });
-//            $.each(bindings.commandBindings, function() {
-//                var group = this;
-//                var groupContainer = $("<div class='btn-group'></div>");
-//                container.append(groupContainer);
-//                $.each(commands, function() {
-//                    var commandBinding = this;
-//                    if (commandBinding.button !== undefined && !commandBinding.button) {
-//                        return;
-//                    }
-//                    var button = $("<button class='btn'>" + commandBinding.commandClass.prototype.name + "</button>");
-//                    if (commandBinding.keyLabel) {
-//                        button.attr("title", "Control+" + commandBinding.keyLabel);
-//                    } else if (commandBinding.key) {
-//                        button.attr("title", "Control+" + String.fromCharCode(commandBinding.key).toUpperCase());
-//                    }
-//                    groupContainer.append(button);
-//                    button.click(function() {
-//                        if (commandBinding.template) {
-//                            self.executeCommandLineInit();
-//                            self.command.val(commandBinding.template);
-//                        } else {
-//                            var command = new commandBinding.commandClass(self.createContext());
-//                            self.executeCommand(command);
-//                        }
-//                    });
-//
-//                });
-//            });
         },
 
         // ---------------------------------------------------------------------
@@ -200,19 +189,19 @@
         },
 
         // ---------------------------------------------------------------------
-        // handle
+        // handle key events of html elements
         // ---------------------------------------------------------------------
         handle : function(element, event) {
 
             var self = this;
             self.element = $(element);
             var command;
-
             event.stopPropagation();
 
             if (event.altKey && event.keyCode !== 18) {
-                // 1 CTRL KEY
+                // 1 ALT KEY
 
+                // get key of event
                 var key = null;
                 if (event.keyCode !== 0) {
                     key = event.keyCode;
@@ -221,26 +210,25 @@
                 }
                 key = String.fromCharCode(key).toLowerCase().charCodeAt(0);
 
-                // new commands
+                // get command by key
                 var commandClass = commands.commandByKey[key];
-                if (commandClass) {
-
-                    // create command
-                    command = new commandClass(self.createContext());
-
-                    // execute command
-                    self.executeCommand(command);
-
-                    event.preventDefault();
+                if (!commandClass) {
                     return;
                 }
 
+                // create command
+                command = new commandClass(self.createContext());
+
+                // execute command
+                self.executeCommand(command);
+
+                event.preventDefault();
+                return;
+
             } else {
-                // 2. NO CTRL KEY
+                // 2. NO ALT KEY
                 switch (event.keyCode) {
                 case 'dummy':
-                    this.executeCommandLineInit();
-                    this.command.val("delete");
                     break;
                 case 27:
                     event.preventDefault();
@@ -267,31 +255,31 @@
 
             if (element && element.length > 0) {
                 self.element = element;
-                self.status.text(self.getPath());
-                self.cssStatus.val(self.getCss());
+                self.statusSpan.text(self.getPath());
+                self.cssInput.val(self.getCss());
             }
 
             if (self.element.length > 0) {
-
                 self.element.focus();
                 if (self.element.get(0).tagName === 'IMG') {
                     self.element.one('load', function() {
                         self.element.focus();
                     });
                 }
-                //if(self.element.get(0).tagName.toUpperCase()==='SPAN' && self.element.text()===''){
-                if (self.element.text() === '' && self.element.attr("contenteditable") === "true") {
-
-                    self.element.text(self.element.get(0).tagName.toLowerCase());
-                    selectText(self.element.get(0));
-                    //var sel = window.getSelection();
-                    //var range = sel.getRangeAt(0);
-                    //var range = document.createRange();
-                    //range.selectNodeContents(self.element.get(0));                   
-                    self.element.focus();
-                    //setTimeout(function(){
-                    //    self.element.text("");
-                    //},0);
+                if (self.element.attr("contenteditable") === "true") {
+                    if(self.element.text()===""){
+                        self.element.text(self.element.get(0).tagName.toLowerCase());
+                        core.selectText(self.element.get(0));
+                        self.element.focus();                        
+                    }
+                }else{
+                    if(self.element.get(0).tagName === 'SPAN' && self.element.text()===""){
+                        var editableElement = $(commands.editableElement);
+                        editableElement.text("span");
+                        self.element.append(editableElement);
+                        self.assignHandlers(self.element);
+                        self.element.focus();
+                    }
                 }
             }
 
@@ -331,11 +319,8 @@
         // ---------------------------------------------------------------------
         executeCommandLineInit : function() {
             var self = this;
-            //setTimeout(function(){
-            self.saveSelection();
-            self.command.focus();
-            self.command.val("");
-            //},0);
+            self.commandInput.focus();
+            self.commandInput.val("");
         },
 
         // ---------------------------------------------------------------------
@@ -345,7 +330,7 @@
 
             // split command line into parts
             var self = this;
-            var commandLine = self.command.val();
+            var commandLine = self.commandInput.val();
             var parts = commandLine.split(" ");
 
             // extract command name
@@ -375,12 +360,9 @@
             }
 
             // clear command line
-            self.command.focus();
-            self.command.val("");
+            self.commandInput.focus();
+            self.commandInput.val("");
 
-            // resore selection
-            self.restoreSelection();
-            
             // and execute
             self.executeCommand(command);
 
@@ -391,7 +373,7 @@
         // ---------------------------------------------------------------------
         executeCommandOld : function() {
             var self = this;
-            var commandString = self.command.val();
+            var commandString = self.commandInput.val();
             var commands = commandString.split(" ");
             var newElement = null;
             switch (commands[0]) {
@@ -419,7 +401,7 @@
             if (this.autocompleteList.indexOf(commandString) === -1) {
                 this.autocompleteList.push(commandString);
             }
-            this.command.val("");
+            this.commandInput.val("");
             if (newElement && newElement.length > 0) {
                 self.element = newElement;
                 self.status.text(self.element.get(0).tagName);
@@ -441,9 +423,9 @@
             $.ajax({
                 url : pageName + ".html",
                 success : function(data) {
-                    self.content.empty();
-                    self.content.append($(data));
-                    self.assignHandlers(self.content);
+                    self.contentDiv.empty();
+                    self.contentDiv.append($(data));
+                    self.assignHandlers(self.contentDiv);
                 },
                 dataType : 'text'
             }).error(function() {
@@ -452,14 +434,14 @@
                 // alert("ok");
             });
             core.url().parameter("page", pageName).submit();
-            //$(".jse-content").focus();
+            // $(".jse-content").focus();
         },
 
         // --------------------------------------------------------------------
         // save page
         // ---------------------------------------------------------------------
         savePage : function(pageName) {
-            var content = this.content.html();
+            var content = this.contentDiv.html();
             if (!pageName) {
                 pageName = core.url().parameter("page");
                 if (!pageName) {
@@ -557,20 +539,4 @@
 
     });
 
-    function selectText(text) {
-        var doc = document
-
-        , range, selection;
-        if (doc.body.createTextRange) { //ms
-            range = doc.body.createTextRange();
-            range.moveToElementText(text);
-            range.select();
-        } else if (window.getSelection) { //all others
-            selection = window.getSelection();
-            range = doc.createRange();
-            range.selectNodeContents(text);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
-    }
 }(this));
