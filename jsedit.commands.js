@@ -77,11 +77,14 @@
             return this.getLeafNode($(node.children().get(0)));
         },
 
-        insert : function() {
+        insert : function() {            
             this.element.after(this.insertElement);
         },
 
         execute : function() {
+            if(this.element.hasClass("jse-content")){
+                throw "Insertion after root element is not possible";
+            }
             var insertElementString = core.tmpl(this.template, this);
             this.insertElement = $(insertElementString);
             this.insert();
@@ -101,10 +104,8 @@
 
         name : 'undo',
         char : 'z',
-        execute : function() {
-            // pop undo command
-            this.editor.commandStack.pop();
-            // pop command for undo
+        execute : function() {          
+            // pop command 
             var command = this.editor.commandStack.pop();
             if (!command) {
                 return;

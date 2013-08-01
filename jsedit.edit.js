@@ -74,7 +74,7 @@
             // create content
             this.contentDiv = $("<div tabindex=1 class='jse-content container'></div>");
             this.containerDiv.append(this.contentDiv);
-            this.contentDiv.append($("<h1 tabindex=1 contenteditable='true'>Heading1</h1>"));
+            this.contentDiv.append($("<h1 tabindex=1 contenteditable='true'>Heading1</h1>"));            
 
             // assign event handlers for all elements in content
             this.relevantElements = "ul, ol, li, div, pre, p, h1, h2, h3, input, img, table, tbody, tr, td, a, span, b";
@@ -84,6 +84,8 @@
             var pageName = core.url().parameter("page");
             if (pageName) {
                 self.loadPage(pageName);
+            }else{
+                this.setElement(this.contentDiv.find("h1"));
             }
 
             // command stack
@@ -243,8 +245,23 @@
         // execute command
         // ---------------------------------------------------------------------
         executeCommand : function(command) {
+            
+            // execute command
+            try{
+                command.execute();    
+            }catch(e){
+                alert(e);
+                return;
+            }
+            
+            // if undo is immpossible -> return
+            if(command.undo===commands.Command.prototype.undo){
+                return;
+            }
+            
+            // put command on command stack (for undo)
             this.commandStack.push(command);
-            command.execute();
+            
         },
 
         // ---------------------------------------------------------------------
@@ -423,9 +440,20 @@
             $.ajax({
                 url : pageName + ".html",
                 success : function(data) {
+                    
+                    // clear old content
                     self.contentDiv.empty();
+                    
+                    // append new content
                     self.contentDiv.append($(data));
                     self.assignHandlers(self.contentDiv);
+                    
+                    // set focus to first contenteditable
+                    var focusElement = $(".jse-content").find('[contenteditable="true"]');
+                    focusElement = $(focusElement.get(0));
+                    if(focusElement.length>0){
+                        self.setElement(focusElement);
+                    }
                 },
                 dataType : 'text'
             }).error(function() {
@@ -434,7 +462,7 @@
                 // alert("ok");
             });
             core.url().parameter("page", pageName).submit();
-            // $(".jse-content").focus();
+            
         },
 
         // --------------------------------------------------------------------
