@@ -435,16 +435,41 @@
     };
 
     // =========================================================================
+    // endsWith
+    // =========================================================================
+    core.endsWith = function(str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    };
+
+    // =========================================================================
+    // startsWith
+    // =========================================================================
+    core.startsWith = function(str, prefix) {
+        return str.indexOf(prefix) === 0;
+    };
+
+    // =========================================================================
     // load stylesheet
     // =========================================================================
     core.loadStyleSheet = function(name){
+        
+        var rel = "stylesheet";
+        if(core.endsWith(name, ".less")){
+            rel = "stylesheet/less";
+        }
+        
         var link = $("<link>");
         link.attr({
                 type : 'text/css',
-                rel  : 'stylesheet',
+                rel  : rel,
                 href : name
         });
-        $("head").append( link );       
+        $("head").append( link );
+        
+        if(core.endsWith(name, ".less")){
+            less.sheets.push(link.get(0));
+            less.refresh();
+        }
     };
 
 })(this);

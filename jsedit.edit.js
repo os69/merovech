@@ -91,11 +91,18 @@
             // command stack
             self.commandStack = [];
             
-            // check for custom css
+            // check for custom css stylesheet
             var css = core.url().parameter("css");
             if(css){
                 core.loadStyleSheet(css);
             }
+            
+            // check for custom less stylesheet
+            var less = core.url().parameter("less");
+            if(less){
+                core.loadStyleSheet(less);
+            }
+
         },
 
         // ---------------------------------------------------------------------
