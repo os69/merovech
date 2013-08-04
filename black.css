@@ -1,0 +1,59 @@
+
+body {
+	background-color: black;	
+} 
+
+
+.jse-content{
+	font-family: Comic Sans MS;
+	color: gray;
+	font-size:1.2em;
+	line-height:1.5em;
+}
+ 
+h1{
+	font-weight:bold;
+	font-size: 2.3em;
+	line-height:1em;
+	font-family: sans-serif;
+	color:#FFCC01;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	padding-bottom: 0.2em;
+	margin: 0.43em 0;	
+
+}
+
+h2{
+	color:white;
+	line-height:1em;
+	font-family: Arial;
+	font-size:1.5em;
+	font-style: italic;
+	margin: 0.66em 0;
+}
+
+.border{
+    border-style: solid;
+    border-width: 5px;
+    border-color: gray;
+    margin: 1em 0;
+	display:block;
+}
+
+.section{
+	margin-top:20px;
+	border-style: solid;
+	border-width: 5px;
+	border-color: gray;
+	background-color: #222222;
+	padding:10px;
+}
+
+.zoom{
+	transition: all 1s ease 0s;
+}
+
+.zoom:hover{
+	width:600px;
+}

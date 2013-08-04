@@ -70,6 +70,72 @@
 
         template : '<img src=<%=url%> width=<%=size%> />',
 
+        insertMode : 'after',
+        editable : true,
+        leaf : true,
+
+        changeIfAllowed : function(text,allowed,oldValue,newValue){
+            if(allowed){
+                return newValue;
+            }else{
+                if(oldValue!==newValue){
+                    alert("not allowed option "+text);
+                }
+                return oldValue;
+            }
+        },
+        
+        setParameters : function(parameters) {
+
+            // evaluate parameters
+            for ( var i = 0; i < parameters.length; ++i) {
+                var parameter = parameters[i];
+                switch (parameter) {
+
+                case 'after':
+                    this.insertMode = "after";
+                    break;
+                case 'before':
+                    this.insertMode = "before";
+                    break;
+                case 'prepend':
+                    this.insertMode = "prepend";
+                    break;
+                case 'append':
+                    this.insertMode = "append";
+                    break;
+                case 'sibling':
+                    this.insertMode = "sibling";
+                    break;
+
+                case 'editable':
+                    this.editable = this.changeIfAllowed("editable",!this.editableLocked,this.editable,true);
+                    break;
+                case 'static':
+                    this.editable = this.changeIfAllowed("static",!this.editableLocked,this.editable,false);
+                    break;
+
+                case 'leaf':
+                    this.leaf = this.changeIfAllowed("leaf",!this.leafLocked,this.editable,true);;
+                    break;
+                case 'container':
+                    this.leaf = this.changeIfAllowed("container",!this.leafLocked,this.editable,false);;
+                    break;
+                }
+            }
+
+            // container elements are not editable
+            if (!this.leaf) {
+                this.editable = false;
+            }
+
+            // editable elements are always leafs 
+            if (this.editable) {
+                this.leaf = true;
+            }
+            
+        },
+
         getLeafNode : function(node) {
             if (node.children().length === 0) {
                 return node;
@@ -77,18 +143,62 @@
             return this.getLeafNode($(node.children().get(0)));
         },
 
-        insert : function() {            
-            this.element.after(this.insertElement);
+        insert : function() {
+            switch (this.insertMode) {
+            case 'before':
+                if (this.element.hasClass("jse-content")) {
+                    throw ("Insertion before root node not possible");
+                }
+                this.element.before(this.insertElement);
+                break;
+            case 'after':
+                if (this.element.hasClass("jse-content")) {
+                    throw ("Insertion after root node not possible");
+                }
+                this.element.after(this.insertElement);
+                break;
+            case 'prepend':
+                if (this.element.attr("contenteditable") === "true") {
+                    throw ("Insertion into editable container not possible");
+                }
+                this.element.prepend(this.insertElement);
+                break;
+            case 'append':
+                if (this.element.attr("contenteditable") === "true") {
+                    throw ("Insertion into editable container not possible");
+                }
+                this.element.append(this.insertElement);
+                break;
+            case 'sibling':
+                var sibling = this.editor.findSibling(this.element, this.siblingType);
+                sibling.after(this.insertElement);
+                break;
+            }
         },
 
         execute : function() {
-            if(this.element.hasClass("jse-content")){
-                throw "Insertion after root element is not possible";
+
+            // assemble insertion element
+            if (this.leaf) {
+                // leaf
+                this.editableElement = "";
+            } else {
+                // container
+                this.editableElement = module.editableElement;
             }
             var insertElementString = core.tmpl(this.template, this);
             this.insertElement = $(insertElementString);
+
+            // set editable attribute
+            if (this.editable) {
+                this.insertElement.attr("contenteditable", true);
+            }
+
+            // insert
             this.insert();
             this.editor.assignHandlers(this.insertElement);
+
+            // set new focus element
             var leafNode = this.getLeafNode(this.insertElement);
             this.editor.setElement(leafNode);
         },
@@ -97,6 +207,7 @@
 
     });
 
+
     // =========================================================================
     // undo
     // =========================================================================
@@ -104,7 +215,7 @@
 
         name : 'undo',
         char : 'z',
-        execute : function() {          
+        execute : function() {
             // pop command 
             var command = this.editor.commandStack.pop();
             if (!command) {
@@ -293,9 +404,7 @@
                     copyElement : command.element
                 });
                 var paste = new module.PasteBeforeCommand(context);
-                this.commands.push(paste);
-                paste.execute();
-                // this.editor.executeCommand(paste);
+                this.editor.executeCommand(paste);
             }
 
         },
@@ -385,13 +494,15 @@
     // =========================================================================
     // -------------------------------------------------------------------------
     // =========================================================================
+    
 
     // =========================================================================
-    // image
+    // img
     // =========================================================================
     module.ImageCommand = core.createDerivedClass(module.InsertBaseCommand, {
         name : 'img',
         commandTemplate : 'img <size> <url>',
+        editable : false,
         setParameters : function(parameters) {
             if (parameters.length >= 1) {
                 this.size = parameters[0];
@@ -399,8 +510,51 @@
             if (parameters.length >= 2) {
                 this.url = parameters[1];
             }
+            module.InsertBaseCommand.prototype.setParameters.apply(this, [parameters.slice(2)]);
         },
         template : '<img tabindex=1 src="<%=url%>" width="<%=size%>" />'
+    });
+
+    // =========================================================================
+    // ol
+    // =========================================================================
+    module.OlCommand = core.createDerivedClass(module.InsertBaseCommand, {
+        name : 'ol',
+        editable:false,
+        editableLocked:true,
+        leaf:false,
+        leafLocked:true,
+        button : 'ol',
+        buttonGroup: 'list',
+        template : '<ol tabindex=1><li tabindex=1><%=editableElement%></li></ol>'
+    });
+
+    // =========================================================================
+    // ul
+    // =========================================================================
+    module.UlCommand = core.createDerivedClass(module.InsertBaseCommand, {
+        name : 'ul',
+        editable:false,
+        editableLocked:true,
+        leaf:false,
+        leafLocked:true,
+        button : 'ul',
+        buttonGroup: 'list',        
+        template : '<ul tabindex=1><li tabindex=1><%=editableElement%></li></ul>'
+    });
+
+    // =========================================================================
+    // li
+    // =========================================================================
+    module.LiCommand = core.createDerivedClass(module.InsertBaseCommand, {
+        name : 'li',
+        insertMode:'sibling',
+        siblingType : 'li',
+        editable:false,
+        leaf:false,
+        button : 'li',
+        buttonGroup: 'list',        
+        template : '<li tabindex=1><%=editableElement%></li>'
     });
 
     // =========================================================================
@@ -413,124 +567,73 @@
             if (parameters.length >= 1) {
                 this.url = parameters[0];
             }
+            module.InsertBaseCommand.prototype.setParameters.apply(this, [parameters.slice(1)]);
         },
-        template : '<a href="jsedit.html?page=<%=url%>" tabindex=1>' + module.editableElement + '</a>'
+        template : '<a href="jsedit.html?page=<%=url%>" tabindex=1><%=editableElement%></a>'
     });
 
     // =========================================================================
     // h1
     // =========================================================================
     module.H1Command = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'ch1',
-        template : '<h1 tabindex=1>' + module.editableElement + '</h1>'
+        name : 'h1',
+        button : 'h1',
+        buttonGroup: 'simple',
+        template : '<h1 tabindex=1><%=editableElement%></h1>'
     });
 
     // =========================================================================
     // h2
     // =========================================================================
     module.H2Command = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'ch2',
-        template : '<h2 tabindex=1>' + module.editableElement + '</h2>'
+        name : 'h2',
+        button : 'h2',
+        buttonGroup: 'simple',
+        template : '<h2 tabindex=1><%=editableElement%></h2>'
     });
 
     // =========================================================================
     // h3
     // =========================================================================
     module.H3Command = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'ch3',
-        template : '<h3 tabindex=1>' + module.editableElement + '</h3>'
-    });
-
-    // =========================================================================
-    // ul
-    // =========================================================================
-    module.UlCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'ul',
-        button : 'ul',
-        buttonGroup : 'list',
-        template : '<ul tabindex=1><li tabindex=1>' + module.editableElement + '</li></ul>'
-    });
-
-    // =========================================================================
-    // ol
-    // =========================================================================
-    module.OlCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'ol',
-        button : 'ol',
-        buttonGroup : 'list',
-
-        template : '<ol tabindex=1><li tabindex=1>' + module.editableElement + '</li></ol>'
-    });
-
-    // =========================================================================
-    // li
-    // =========================================================================
-    module.LiCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'li',
-        char : 'i',
-        button : 'li',
-        buttonGroup : 'list',
-        insert : function() {
-            var sibling = this.editor.findSibling(this.element, "li");
-            sibling.after(this.insertElement);
-        },
-        template : '<li tabindex=1>' + module.editableElement + '</li>'
+        name : 'h3',
+        template : '<h3 tabindex=1><%=editableElement%></h3>'
     });
 
     // =========================================================================
     // div
     // =========================================================================
     module.DivCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'cdiv',
-        template : '<div tabindex=1>' + module.editableElement + '</div>'
+        name : 'div',
+        button : 'text',
+        buttonGroup: 'simple',
+        template : '<div tabindex=1><%=editableElement%></div>'
     });
 
     // =========================================================================
     // pre
     // =========================================================================
     module.PreCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'cpre',
-        template : '<pre tabindex=1>' + module.editableElement + '</pre>'
+        name : 'pre',
+        button : 'code',
+        buttonGroup: 'simple',
+        template : '<pre tabindex=1><%=editableElement%></pre>'
     });
 
     // =========================================================================
     // bold
     // =========================================================================
     module.BoldCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'cbold',
-        template : '<b tabindex=1>' + module.editableElement + '</b>'
+        name : 'bold',
+        template : '<b tabindex=1><%=editableElement%></b>'
     });
 
     // =========================================================================
     // span
     // =========================================================================
     module.SpanCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'cspan',
-        template : '<span tabindex=1>' + module.editableElement + '</span>'
-    });
-
-    // =========================================================================
-    // table
-    // =========================================================================
-    module.TableCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'table',
-        template : '<table tabindex=1><tbody tabindex=1><tr tabindex=1><td tabindex=1>' + module.editableElement + '</td></tr></tbody></table>'
-    });
-
-    // =========================================================================
-    // tr
-    // =========================================================================
-    module.TableRowCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'tr',
-        template : '<tr tabindex=1><td tabindex=1>' + module.editableElement + '</td></tr>'
-    });
-
-    // =========================================================================
-    // td
-    // =========================================================================
-    module.TableDataCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'td',
-        template : '<td tabindex=1>' + module.editableElement + '</td>'
+        name : 'span',
+        template : '<span tabindex=1><%=editableElement%></span>'
     });
 
     // =========================================================================
@@ -538,75 +641,40 @@
     // =========================================================================
     module.ParagraphCommand = core.createDerivedClass(module.InsertBaseCommand, {
         name : 'cp',
-        template : '<p tabindex=1>' + module.editableElement + '</p>'
+        template : '<p tabindex=1><%=editableElement%></p>'
+    });
+
+
+    // =========================================================================
+    // table
+    // =========================================================================
+    module.TableCommand = core.createDerivedClass(module.InsertBaseCommand, {
+        name : 'table',
+        editable:false,
+        editableLocked:true,
+        leaf:false,
+        leafLocked:true,
+        template : '<table tabindex=1><tbody tabindex=1><tr tabindex=1><td tabindex=1><%=editableElement%></td></tr></tbody></table>'
     });
 
     // =========================================================================
-    // -------------------------------------------------------------------------
+    // tr
     // =========================================================================
-
-    // =========================================================================
-    // eh1
-    // =========================================================================
-    module.EH1Command = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'h1',
-        button : 'h1',
-        buttonGroup : 'simple',
-        template : '<h1 tabindex=1 contenteditable=true></h1>'
+    module.TableRowCommand = core.createDerivedClass(module.InsertBaseCommand, {
+        name : 'tr',
+        editable:false,
+        editableLocked:true,
+        leaf:false,
+        leafLocked:true,
+        template : '<tr tabindex=1><td tabindex=1><%=editableElement%></td></tr>'
     });
 
     // =========================================================================
-    // eh2
+    // td
     // =========================================================================
-    module.EH2Command = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'h2',
-        button : 'h2',
-        buttonGroup : 'simple',
-        template : '<h2 tabindex=1 contenteditable=true></h2>'
-    });
-
-    // =========================================================================
-    // eh3
-    // =========================================================================
-    module.EH3Command = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'h3',
-        template : '<h3 tabindex=1 contenteditable=true></h3>'
-    });
-
-    // =========================================================================
-    // espan
-    // =========================================================================
-    module.ESpanCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'span',
-        button : 'text',
-        buttonGroup : 'simple',
-        template : '<span tabindex=1 contenteditable=true></span>'
-    });
-
-    // =========================================================================
-    // ediv
-    // =========================================================================
-    module.EDivCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'div',
-        template : '<div tabindex=1 contenteditable=true></div>'
-    });
-
-    // =========================================================================
-    // ebold
-    // =========================================================================
-    module.EBoldCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'bold',
-        button : 'bold',
-        buttonGroup : 'simple',
-        template : '<b tabindex=1 contenteditable=true></b>'
-    });
-
-    // =========================================================================
-    // eparagraph
-    // =========================================================================
-    module.EParagraphCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'p',
-        template : '<p tabindex=1 contenteditable=true></p>'
+    module.TableDataCommand = core.createDerivedClass(module.InsertBaseCommand, {
+        name : 'td',
+        template : '<td tabindex=1><%=editableElement%></td>'
     });
 
     // =========================================================================
@@ -616,27 +684,30 @@
         name : 'attr',
         execute : function() {
             var self = this;
-            var fields = [];           
-            for (var attr, i=0, attrs=self.element.get(0).attributes, l=attrs.length; i<l; i++){
+            var fields = [];
+            for ( var attr, i = 0, attrs = self.element.get(0).attributes, l = attrs.length; i < l; i++) {
                 attr = attrs.item(i);
-                fields.push({name : attr.nodeName, value:attr.nodeValue});
+                fields.push({
+                    name : attr.nodeName,
+                    value : attr.nodeValue
+                });
             }
             core.nameValueDialog({
                 fields : fields,
                 title : 'Attributes'
             }, function(delta) {
-                for(var i=0;i<delta.addedFields.length;++i){
+                for ( var i = 0; i < delta.addedFields.length; ++i) {
                     var field = delta.addedFields[i];
-                    self.element.attr(field.name,field.value);
+                    self.element.attr(field.name, field.value);
                 }
-                for(var i=0;i<delta.deletedFields.length;++i){
+                for ( var i = 0; i < delta.deletedFields.length; ++i) {
                     var field = delta.deletedFields[i];
                     self.element.removeAttr(field.name);
                 }
-                for(var i=0;i<delta.changedFields.length;++i){
+                for ( var i = 0; i < delta.changedFields.length; ++i) {
                     var field = delta.changedFields[i];
-                    self.element.attr(field.name,field.newValue);
-                }               
+                    self.element.attr(field.name, field.newValue);
+                }
             });
         }
     });

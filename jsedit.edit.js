@@ -106,7 +106,10 @@
             switch (event.keyCode) {
             case 13:
                 event.preventDefault();
-                self.executeCommandLine();
+                // async needed if command is choosen from history (don't know why)
+                setTimeout(function(){
+                    self.executeCommandLine();    
+                },0);                
                 break;
             case 27:
                 self.element.focus();
@@ -152,6 +155,11 @@
                     container.append(group);
                 }
                 var button = $("<button class='btn'>" + prot.button + "</button>");
+                if(commandClass.prototype.charLabel){
+                    button.attr("title",commandClass.prototype.charLabel);
+                }else if(commandClass.prototype.char){
+                    button.attr("title","ALT+"+commandClass.prototype.char.toUpperCase());
+                }
                 group.append(button);
                 button.click(function() {
                     if (prot.commandTemplate) {
@@ -272,7 +280,9 @@
 
             if (element && element.length > 0) {
                 self.element = element;
-                self.statusSpan.text(self.getPath());
+                var path = self.getPath();
+                self.statusSpan.text(path);
+                self.statusSpan.attr("title",path);
                 self.cssInput.val(self.getCss());
             }
 
