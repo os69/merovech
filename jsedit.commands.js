@@ -207,7 +207,6 @@
 
     });
 
-
     // =========================================================================
     // undo
     // =========================================================================
@@ -215,6 +214,7 @@
 
         name : 'undo',
         char : 'z',
+        doc  : 'Undo of DOM operations (insertion, deletion, ... of DOM nodes)',
         execute : function() {
             // pop command 
             var command = this.editor.commandStack.pop();
@@ -232,7 +232,9 @@
 
         name : 'prev',
         charCode : 38,
-
+        charLabel : 'Alt+CursorLeft',
+        doc: 'Move focus to preceding dom element',
+        
         execute : function() {
             if (this.element.hasClass('jse-content')) {
                 return;
@@ -252,6 +254,8 @@
 
         name : 'next',
         charCode : 40,
+        charLabel: 'Alt+CursorRight',
+        doc:'Move focus to next dom element',
 
         execute : function() {
             if (this.element.hasClass('jse-content')) {
@@ -272,6 +276,8 @@
 
         name : 'parent',
         charCode : 37,
+        charLabel:'Alt+CursorUp',
+        doc : 'Move cursor to parent dom element',        
 
         execute : function() {
             if (this.element.hasClass('jse-content')) {
@@ -501,7 +507,7 @@
     // =========================================================================
     module.ImageCommand = core.createDerivedClass(module.InsertBaseCommand, {
         name : 'img',
-        commandTemplate : 'img <size> <url>',
+        commandTemplate : 'img <size> <url> <ll>',
         editable : false,
         setParameters : function(parameters) {
             if (parameters.length >= 1) {

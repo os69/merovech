@@ -36,7 +36,7 @@
             this.navbarDiv.append(this.toolbarDiv);
 
             // create brand
-            this.toolbarDiv.append('<a class="brand" href="#">Merovech</a>');
+            this.toolbarDiv.append('<a class="brand" href="help.html">Merovech</a>');
 
             // create form (for commands and css status field)
             this.inputForm = $('<form class="navbar-form pull-left" style="margin-right:10px"></form>');
