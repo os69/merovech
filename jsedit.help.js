@@ -31,12 +31,24 @@
     
     module.generateCommandHelp = function(parentNode,command){
         parentNode.append("<h2>"+command.prototype.name+"</h2>");
+        var doc="";
         if(command.prototype.doc){
-            parentNode.append("<p>"+command.prototype.doc+"</p>");
+            doc+=command.prototype.doc;
         }
-        if(command.prototype.commandTemplate){
-            parentNode.append("<p>Synopsis "+module.formatCommandTemplate(command.prototype.commandTemplate)+"</p>");
+        if(!command.prototype.doc && command.prototype instanceof commands.InsertBaseCommand){
+            doc+="Insert "+command.prototype.name+ "tag.";
         }
+        parentNode.append("<p>"+doc+"</p>");
+        var synopsis = "Synopsis :";
+        if(command.prototype.synopsis){
+            synopsis += command.prototype.synopsis;
+        }else{
+            synopsis += command.prototype.name;
+        }
+        if(command.prototype instanceof commands.InsertBaseCommand){
+            synopsis += " [prepend|append|before|after] [container]";
+        }
+        parentNode.append("<p>"+synopsis+"</p>");
         if(command.prototype.charLabel){
             parentNode.append("<p>Keyboard shortcut "+command.prototype.charLabel+"</p>");
         }else if(command.prototype.char){

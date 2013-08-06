@@ -214,7 +214,7 @@
 
         name : 'undo',
         char : 'z',
-        doc  : 'Undo of DOM operations (insertion, deletion, ... of DOM nodes)',
+        doc  : 'Undo of DOM operations (insertion, deletion, ... of DOM nodes).',
         execute : function() {
             // pop command 
             var command = this.editor.commandStack.pop();
@@ -233,7 +233,7 @@
         name : 'prev',
         charCode : 38,
         charLabel : 'Alt+CursorLeft',
-        doc: 'Move focus to preceding dom element',
+        doc: 'Move focus to preceding dom element.',
         
         execute : function() {
             if (this.element.hasClass('jse-content')) {
@@ -255,7 +255,7 @@
         name : 'next',
         charCode : 40,
         charLabel: 'Alt+CursorRight',
-        doc:'Move focus to next dom element',
+        doc:'Move focus to next dom element.',
 
         execute : function() {
             if (this.element.hasClass('jse-content')) {
@@ -277,7 +277,7 @@
         name : 'parent',
         charCode : 37,
         charLabel:'Alt+CursorUp',
-        doc : 'Move cursor to parent dom element',        
+        doc : 'Move focus to parent dom element.',        
 
         execute : function() {
             if (this.element.hasClass('jse-content')) {
@@ -295,7 +295,7 @@
 
         name : 'firstchild',
         charCode : 39,
-
+        doc: 'Move focus to first child.',
         execute : function() {
             var newElement = this.element.children(":first-child");
             this.editor.setElement(newElement);
@@ -310,6 +310,7 @@
         char : 'c',
         button : 'copy',
         buttonGroup : 'tools',
+        doc : 'Copy focused element to buffer.',
         execute : function() {
             this.editor.copyElement = this.element;
         }
@@ -323,6 +324,7 @@
         char : 'v',
         button : 'paste',
         buttonGroup : 'tools',
+        doc : 'Paste buffer after focused element.',
         execute : function() {
             this.insertElement = this.editor.copyElement.clone(false);
             this.element.after(this.insertElement);
@@ -338,6 +340,7 @@
     module.PasteBeforeCommand = core.createDerivedClass(module.Command, {
 
         name : 'pastebefore',
+        doc: 'Paste buffer before focused element.',
 
         execute : function() {
             if (!this.copyElement) {
@@ -360,6 +363,7 @@
         char : 'x',
         button : 'cut',
         buttonGroup : 'tools',
+        doc : 'Cut focused element.',
         execute : function() {
             var newElement = this.element.next();
             if (newElement.length === 0) {
@@ -382,7 +386,7 @@
     module.UnCutCommand = core.createDerivedClass(module.Command, {
 
         name : 'uncut',
-
+        doc: 'Insert cut elements before focused element.',
         execute : function() {
 
             // search for first cut command
@@ -432,6 +436,7 @@
         char : 'd',
         button : 'del',
         buttonGroup : 'tools',
+        doc: 'Delete focused element',
         execute : function() {
             var newElement = this.element.next();
             if (newElement.length === 0) {
@@ -452,9 +457,10 @@
     module.LoadCommand = core.createDerivedClass(module.Command, {
         name : 'load',
         char : 'l',
-        commandTemplate : 'load <pagename>',
         button : 'load',
         buttonGroup : 'tools',
+        doc: 'Load page.',
+        synopsis : 'load [<i>pagename</i>]',
         setParameters : function(parameters) {
             if (parameters.length >= 1) {
                 this.pageName = parameters[0];
@@ -472,9 +478,10 @@
     module.SaveCommand = core.createDerivedClass(module.Command, {
         name : 'save',
         char : 's',
-        commandTemplate : 'save <pagename>',
         button : 'save',
         buttonGroup : 'tools',
+        doc : 'Save page.',
+        synopsis : 'save [<i>pagename</i>]',
         setParameters : function(parameters) {
             if (parameters.length >= 1) {
                 this.pageName = parameters[0];
@@ -491,7 +498,7 @@
     module.StaticCommand = core.createDerivedClass(module.Command, {
 
         name : 'static',
-
+        doc: 'Disable editor function an switch to static HTML. This is useful for copying marked text.',
         execute : function() {
             this.editor.makeStatic();
         }
@@ -507,8 +514,10 @@
     // =========================================================================
     module.ImageCommand = core.createDerivedClass(module.InsertBaseCommand, {
         name : 'img',
-        commandTemplate : 'img <size> <url> <ll>',
+        commandTemplate : 'img <size> <path>',
         editable : false,
+        synopsis : 'img <i>size</i> <i>path</i>',
+        doc : 'Insert an image.',
         setParameters : function(parameters) {
             if (parameters.length >= 1) {
                 this.size = parameters[0];
@@ -554,6 +563,7 @@
     // =========================================================================
     module.LiCommand = core.createDerivedClass(module.InsertBaseCommand, {
         name : 'li',
+        char : 'i',
         insertMode:'sibling',
         siblingType : 'li',
         editable:false,
@@ -569,6 +579,7 @@
     module.LinkCommand = core.createDerivedClass(module.InsertBaseCommand, {
         name : 'link',
         commandTemplate : 'link <target>',
+        synopsis : 'link <i>path</i>',
         setParameters : function(parameters) {
             if (parameters.length >= 1) {
                 this.url = parameters[0];

@@ -169,13 +169,17 @@
                 var value = this.decode(pair[1]);
                 this.parameters[name] = value;
             }
+            this.modified=false;
         },
 
         parameter : function(name, value) {
             if (arguments.length === 1) {
                 return this.parameters[name];
             } else {
-                this.parameters[name] = value;
+                if(value!==this.parameters[name]){
+                    this.parameters[name] = value;
+                    this.modified=true;                    
+                }
             }
             return this;
         },
@@ -188,12 +192,19 @@
                 }
                 return JSON.parse(value2);
             } else {
-                this.parameters[name] = JSON.stringify(value);
+                var valueString = JSON.stringify(value);
+                if(valueString!==this.parameters[name]){
+                    this.parameters[name] = valueString;
+                    this.modified=true;
+                }                 
             }
             return this;
         },
 
         submit : function() {
+            if(!this.modified){
+                return;
+            }
             var parameterString = "";
             var first = true;
             for ( var parameterName in this.parameters) {
@@ -209,6 +220,7 @@
             var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
             newUrl += "?" + parameterString;
             window.history.pushState("dummy", "Title", newUrl);
+            this.modified=false;
         },
 
         encode : function(text) {

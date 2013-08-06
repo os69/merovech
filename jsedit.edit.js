@@ -471,14 +471,18 @@
                     if(focusElement.length>0){
                         self.setElement(focusElement);
                     }
+                    
+                    // adjust url
+                    core.url().parameter("page", pageName).submit();
+                    
                 },
                 dataType : 'text'
             }).error(function() {
-                alert("error:" + arguments[0].statusText);
+                alert("Cannot load page '"+pageName+"' error:" + arguments[0].statusText);
             }).success(function() {
                 // alert("ok");
             });
-            core.url().parameter("page", pageName).submit();
+            
             
         },
 
