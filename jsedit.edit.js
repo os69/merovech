@@ -205,6 +205,20 @@
             cb(list);
         },
 
+     
+        getCaretPos : function(){
+            this.range= window.getSelection().getRangeAt(0);
+        //  alert('start: '+start+'\n\n end: '+ end+'\n\n text: '+selectedText +'\n\n startnode: '+$(startNode.parentNode).index()+'\n\n endnode: '+$(endNode.parentNode).index() );
+        },
+        
+        restoreCaretPos : function(){
+            var selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                selection.removeAllRanges();
+                selection.addRange(this.range);
+            }
+        },
+        
         // ---------------------------------------------------------------------
         // handle key events of html elements
         // ---------------------------------------------------------------------
@@ -212,9 +226,29 @@
 
             var self = this;
             self.element = $(element);
-            var command;
-            event.stopPropagation();
+            var command;            
 
+            if(event.ctrlKey && event.keyCode !== 17){
+                var key = null;
+                if (event.keyCode !== 0) {
+                    key = event.keyCode;
+                } else {
+                    key = event.charCode;
+                }
+                key = String.fromCharCode(key).toLowerCase().charCodeAt(0);
+                if(key===118){
+                    event.stopPropagation();
+                    self.getCaretPos();
+                    this.commandInput.val("");
+                    this.commandInput.focus();
+                    setTimeout(function(){
+                        self.element.focus();
+                        self.restoreCaretPos();
+                        document.execCommand("insertText", false, self.commandInput.val());
+                        self.commandInput.val("");
+                    },0);
+                }
+            }
             if (event.altKey && event.keyCode !== 18) {
                 // 1 ALT KEY
 
@@ -239,6 +273,7 @@
                 // execute command
                 self.executeCommand(command);
 
+                event.stopPropagation();
                 event.preventDefault();
                 return;
 
@@ -248,6 +283,7 @@
                 case 'dummy':
                     break;
                 case 27:
+                    event.stopPropagation();
                     event.preventDefault();
                     this.executeCommandLineInit();
                     break;
@@ -552,6 +588,24 @@
                 var link = $(this).attr("href");
                 window.location = link;
             });
+            
+//            elements.off('paste');
+//            elements.on('paste', function (event) {
+//                event.stopPropagation();
+//                var element = $(this);
+//                setTimeout(function () {
+//                  if(element.get(0).tagName==='SPAN'){
+//                      var parent = element.parent();
+//                      var children = parent.children();
+//                      var text=parent.text();
+//                      parent.empty();
+//                      parent.append($("<span>"+text+"</span>"));
+//                  }else{
+//                      var text = $(element).text();
+//                      $(element).html(text);                      
+//                  }
+//                }, 1000);
+//              });
 
         },
 

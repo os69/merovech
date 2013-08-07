@@ -14,9 +14,10 @@
     global.jsedit.commands = {};
     var commands = global.jsedit.commands;
     var module = commands;
-
+    
     module.editableElement = '<span tabindex=1 contenteditable="true"></span>';
-
+    
+    
     // =========================================================================
     // base class commands
     // =========================================================================
@@ -28,6 +29,33 @@
         },
         undo : function() {
 
+        },
+        
+        nextElement : function(){
+            
+            // check for next element
+            var newElement = this.element.next();
+            if(newElement.length>0){
+                return newElement;
+            }
+            
+            // check for previous element
+            newElement = this.element.prev();
+            if(newElement.length>0){
+                return newElement;
+            }
+            
+            // check for parent element
+            newElement = this.element.parent();
+            if(!newElement.hasClass("jse-content")){
+                return newElement;
+            }
+            
+            // create default element
+            var defaultElement = $(module.editableElement);            
+            newElement.append(defaultElement);
+            this.editor.assignHandlers(defaultElement);
+            return defaultElement;
         }
     });
 
@@ -236,12 +264,12 @@
         doc: 'Move focus to preceding dom element.',
         
         execute : function() {
-            if (this.element.hasClass('jse-content')) {
-                return;
-            }
             var newElement = this.element.prev();
             if (newElement.length === 0) {
-                newElement = this.element.parent();
+                newElement = this.element.parent().children().slice(-1);
+                if(newElement.length===0){
+                    return;
+                }
             }
             this.editor.setElement(newElement);
         }
@@ -258,12 +286,12 @@
         doc:'Move focus to next dom element.',
 
         execute : function() {
-            if (this.element.hasClass('jse-content')) {
-                return;
-            }
             var newElement = this.element.next();
             if (newElement.length === 0) {
-                newElement = this.element.children(":first-child");
+                newElement = this.element.parent().children().slice(0,1);
+                if(newElement.length===0){
+                    return;
+                }
             }
             this.editor.setElement(newElement);
         }
@@ -280,24 +308,27 @@
         doc : 'Move focus to parent dom element.',        
 
         execute : function() {
-            if (this.element.hasClass('jse-content')) {
+            var newElement = this.element.parent();
+            if (newElement.hasClass('jse-content')) {
                 return;
             }
-            var newElement = this.element.parent();
             this.editor.setElement(newElement);
         }
     });
 
     // =========================================================================
-    // firstchild
+    // child
     // =========================================================================
-    module.FirstChildCommand = core.createDerivedClass(module.Command, {
+    module.ChildCommand = core.createDerivedClass(module.Command, {
 
-        name : 'firstchild',
+        name : 'child',
         charCode : 39,
         doc: 'Move focus to first child.',
         execute : function() {
             var newElement = this.element.children(":first-child");
+            if(newElement.length===0){
+                return;
+            }
             this.editor.setElement(newElement);
         }
     });
@@ -365,13 +396,7 @@
         buttonGroup : 'tools',
         doc : 'Cut focused element.',
         execute : function() {
-            var newElement = this.element.next();
-            if (newElement.length === 0) {
-                newElement = this.element.prev();
-            }
-            if (newElement.length === 0) {
-                newElement = this.element.parent();
-            }
+            var newElement = this.nextElement();
             this.editor.copyElement = this.element;
             this.element.remove();
             this.editor.setElement(newElement);
@@ -438,13 +463,7 @@
         buttonGroup : 'tools',
         doc: 'Delete focused element',
         execute : function() {
-            var newElement = this.element.next();
-            if (newElement.length === 0) {
-                newElement = this.element.prev();
-            }
-            if (newElement.length === 0) {
-                newElement = this.element.parent();
-            }
+            var newElement = this.nextElement();
             this.element.remove();
             this.editor.setElement(newElement);
         },
