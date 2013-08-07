@@ -514,10 +514,12 @@
     // =========================================================================
     module.ImageCommand = core.createDerivedClass(module.InsertBaseCommand, {
         name : 'img',
-        commandTemplate : 'img <size> <path>',
+        commandTemplate : 'img <width> <url>',
         editable : false,
-        synopsis : 'img <i>size</i> <i>path</i>',
+        synopsis : 'img <i>width</i> <i>url</i>',
         doc : 'Insert an image.',
+        parameterDoc : {'width' : 'Width of image.',
+                       'url'   : 'Url of image.'},
         setParameters : function(parameters) {
             if (parameters.length >= 1) {
                 this.size = parameters[0];
@@ -527,7 +529,7 @@
             }
             module.InsertBaseCommand.prototype.setParameters.apply(this, [parameters.slice(2)]);
         },
-        template : '<img tabindex=1 src="<%=url%>" width="<%=size%>" />'
+        template : '<img tabindex=1 src="<%=url%>" width="<%=width%>" />'
     });
 
     // =========================================================================
