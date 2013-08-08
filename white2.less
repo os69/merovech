@@ -1,12 +1,13 @@
-@background-color : #DFDFDF;
-@section-background-color : #EBEADD;
+@background-color : white;
+@section-background-color : #F9F9F9;
 
 @border-color: gray;
 
-@h1-color: #344258;
-@h2-color: #344258;
-@text-color:#344258;
-@text-font: Comic Sans MS;
+@h1-color: #990000;
+@h2-color: #005580;
+@text-color:black;
+@h-font : Arial,sans-serif;
+@text-font: Comic Sans MS;;
 
 body {
 	background-color: @background-color;	
@@ -27,7 +28,7 @@ h1{
 	font-weight:bold;
 	font-size: 2.3em;
 	line-height:1em;
-	font-family: sans-serif;
+	font-family: @h-font;
 	color:@h1-color;
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
@@ -38,7 +39,7 @@ h1{
 h2{
 	color:@h2-color;
 	line-height:1em;
-	font-family: Arial;
+	font-family: @h-font;
 	font-size:1.5em;
 	font-style: italic;
 	margin: 0.66em 0;
@@ -55,7 +56,7 @@ h2{
 .section{
 	margin-top:20px;
 	border-style: solid;
-	border-width: 5px;
+	border-width: 2px;
 	border-color: @border-color;
 	background-color: @section-background-color;
 	padding:10px;

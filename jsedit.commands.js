@@ -67,7 +67,7 @@
         if (this.prev.length > 0) {
             this.element.insertAfter(this.prev);
         } else {
-            this.parent.append(this.element);
+            this.parent.prepend(this.element);
         }
         this.editor.assignHandlers(this.element);
         this.editor.setElement(this.element);
@@ -102,7 +102,7 @@
         insertMode : 'after',
         editable : true,
         leaf : true,
-
+        
         changeIfAllowed : function(text,allowed,oldValue,newValue){
             if(allowed){
                 return newValue;
