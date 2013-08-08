@@ -205,18 +205,35 @@
             cb(list);
         },
 
-     
-        getCaretPos : function(){
-            this.range= window.getSelection().getRangeAt(0);
-        //  alert('start: '+start+'\n\n end: '+ end+'\n\n text: '+selectedText +'\n\n startnode: '+$(startNode.parentNode).index()+'\n\n endnode: '+$(endNode.parentNode).index() );
-        },
-        
-        restoreCaretPos : function(){
-            var selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                selection.removeAllRanges();
-                selection.addRange(this.range);
+        // ---------------------------------------------------------------------
+        // get character code from event
+        // ---------------------------------------------------------------------
+        getCharCode : function(event){
+            var key;
+            if (event.keyCode !== 0) {
+                key = event.keyCode;
+            } else {
+                key = event.charCode;
             }
+            key = String.fromCharCode(key).toLowerCase().charCodeAt(0);
+            return key;
+        },
+
+        // ---------------------------------------------------------------------
+        // handle paste event
+        // ---------------------------------------------------------------------
+        handlePaste : function(event){
+            var self = this;
+            event.stopPropagation();
+            core.getCaretPos();            
+            this.commandInput.val("");
+            this.commandInput.focus();            
+            setTimeout(function(){
+                self.element.focus();
+                core.restoreCaretPos();
+                document.execCommand("insertText", false, self.commandInput.val());
+                self.commandInput.val("");
+            },0);            
         },
         
         // ---------------------------------------------------------------------
@@ -227,41 +244,25 @@
             var self = this;
             self.element = $(element);
             var command;            
-
+            var key = null;
+            
             if(event.ctrlKey && event.keyCode !== 17){
-                var key = null;
-                if (event.keyCode !== 0) {
-                    key = event.keyCode;
-                } else {
-                    key = event.charCode;
-                }
-                key = String.fromCharCode(key).toLowerCase().charCodeAt(0);
+                
+                //. 1 CTRL KEY
+                // -------------------------------------------------------------
+
+                key = self.getCharCode(event);
                 if(key===118){
-                    event.stopPropagation();
-                    self.getCaretPos();
-                    this.commandInput.val("");
-                    this.commandInput.focus();
-                    setTimeout(function(){
-                        self.element.focus();
-                        self.restoreCaretPos();
-                        document.execCommand("insertText", false, self.commandInput.val());
-                        self.commandInput.val("");
-                    },0);
+                    self.handlePaste(event);
                 }
-            }
-            if (event.altKey && event.keyCode !== 18) {
-                // 1 ALT KEY
-
-                // get key of event
-                var key = null;
-                if (event.keyCode !== 0) {
-                    key = event.keyCode;
-                } else {
-                    key = event.charCode;
-                }
-                key = String.fromCharCode(key).toLowerCase().charCodeAt(0);
-
+                
+            } else if (event.altKey && event.keyCode !== 18) {
+                
+                // 2. ALT KEY
+                // -------------------------------------------------------------                
+                
                 // get command by key
+                key = self.getCharCode(event);
                 var commandClass = commands.commandByKey[key];
                 if (!commandClass) {
                     return;
@@ -273,12 +274,15 @@
                 // execute command
                 self.executeCommand(command);
 
+                // prevent default and return
                 event.stopPropagation();
                 event.preventDefault();
                 return;
 
             } else {
-                // 2. NO ALT KEY
+                
+                // 3. OTHERS
+                // -------------------------------------------------------------
                 switch (event.keyCode) {
                 case 'dummy':
                     break;

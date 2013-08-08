@@ -270,6 +270,24 @@
     };
 
     // =========================================================================
+    // store cursor position
+    // =========================================================================
+    core.getCaretPos = function(){
+        core.selRange= window.getSelection().getRangeAt(0);
+    };
+
+    // =========================================================================
+    // restore cursor position
+    // =========================================================================
+    core.restoreCaretPos = function(){
+        var selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            selection.removeAllRanges();
+            selection.addRange(core.selRange);
+        }
+    };
+
+    // =========================================================================
     // Simple JavaScript Templating
     // John Resig - http://ejohn.org/ - MIT Licensed
     // =========================================================================

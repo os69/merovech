@@ -27,6 +27,7 @@
             this.prev = this.element.prev();
             this.parent = this.element.parent();
         },
+        
         undo : function() {
 
         },
