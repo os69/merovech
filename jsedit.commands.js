@@ -58,8 +58,9 @@
             this.editor.assignHandlers(defaultElement);
             return defaultElement;
         }
+        
     });
-
+     
     // =========================================================================
     // undo deletion
     // =========================================================================
@@ -481,6 +482,7 @@
         buttonGroup : 'tools',
         doc: 'Load page.',
         synopsis : 'load [<i>pagename</i>]',
+        parameterDoc : {'pagename' : 'Name of page.'},        
         setParameters : function(parameters) {
             if (parameters.length >= 1) {
                 this.pageName = parameters[0];
@@ -502,6 +504,7 @@
         buttonGroup : 'tools',
         doc : 'Save page.',
         synopsis : 'save [<i>pagename</i>]',
+        parameterDoc : {'pagename' : 'Name of page.'},
         setParameters : function(parameters) {
             if (parameters.length >= 1) {
                 this.pageName = parameters[0];
@@ -601,14 +604,15 @@
     module.LinkCommand = core.createDerivedClass(module.InsertBaseCommand, {
         name : 'link',
         commandTemplate : 'link <target>',
-        synopsis : 'link <i>path</i>',
+        synopsis : 'link <i>target</i>',
+        parameterDoc : {'target' : 'Target URL.'},        
         setParameters : function(parameters) {
             if (parameters.length >= 1) {
-                this.url = parameters[0];
+                this.target = parameters[0];
             }
             module.InsertBaseCommand.prototype.setParameters.apply(this, [parameters.slice(1)]);
         },
-        template : '<a href="jsedit.html?page=<%=url%>" tabindex=1><%=editableElement%></a>'
+        template : '<a href="<%=target%>" tabindex=1><%=editableElement%></a>'
     });
 
     // =========================================================================
@@ -679,10 +683,17 @@
     // paragraph
     // =========================================================================
     module.ParagraphCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name : 'cp',
+        name : 'paragraph',
         template : '<p tabindex=1><%=editableElement%></p>'
     });
 
+    // =========================================================================
+    // italic
+    // =========================================================================
+    module.ParagraphCommand = core.createDerivedClass(module.InsertBaseCommand, {
+        name : 'italic',
+        template : '<i tabindex=1><%=editableElement%></i>'
+    });
 
     // =========================================================================
     // table
@@ -713,6 +724,10 @@
     // =========================================================================
     module.TableDataCommand = core.createDerivedClass(module.InsertBaseCommand, {
         name : 'td',
+        editable:false,
+        editableLocked:true,
+        leaf:false,
+        leafLocked:true,        
         template : '<td tabindex=1><%=editableElement%></td>'
     });
 
@@ -721,6 +736,7 @@
     // =========================================================================
     module.AttributeDialogCommand = core.createDerivedClass(module.Command, {
         name : 'attr',
+        doc : 'Opens a dialog for editing the attributes of the focused element.',
         execute : function() {
             var self = this;
             var fields = [];

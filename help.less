@@ -1,0 +1,44 @@
+@background-color : #F9F9F9;
+@paper-background-color :#FFFFFF;
+
+@command-separation-color : #CCCCCC;
+
+body{
+background-color: @background-color;
+font-family:Sans-Serif;
+font-size:1.1em;
+}
+
+.help-container{
+    width:80%;
+    margin-left:auto;
+    margin-right:auto;
+    background-color : @paper-background-color;
+    padding-left:1em;
+    padding-right:1em;
+    padding-top:0.3em;
+    padding-bottom:0.3em;
+}
+
+.command-container{
+   //background-color : @command-background-color;
+   border-bottom-width : 1px;
+   border-bottom-style : solid;
+   border-bottom-color : @command-separation-color;
+}
+
+.command-container:last-child{
+   border-bottom-style : none;
+}
+h2{
+color: #990000;
+}
+
+td{
+ padding-left:5px;
+}
+
+p.section{
+    font-style: italic;
+    font-weight: bold;
+}
