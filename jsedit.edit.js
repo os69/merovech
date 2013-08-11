@@ -77,7 +77,7 @@
             this.contentDiv.append($("<h1 tabindex=1 contenteditable='true'>Heading1</h1>"));            
 
             // assign event handlers for all elements in content
-            this.relevantElements = "ul, ol, li, div, pre, p, h1, h2, h3, input, img, table, tbody, tr, td, a, span, b";
+            this.relevantElements = commands.relevantElements;
             this.assignHandlers(this.contentDiv);
 
             // load page
@@ -169,9 +169,9 @@
                 }
                 group.append(button);
                 button.click(function() {
-                    if (prot.commandTemplate) {
+                    if (prot.buttonTemplate) {
                         self.executeCommandLineInit();
-                        self.commandInput.val(prot.commandTemplate);
+                        self.commandInput.val(prot.buttonTemplate);
                     } else {
                         var command = new commandClass(self.createContext());
                         self.executeCommand(command);
@@ -184,11 +184,11 @@
         // ---------------------------------------------------------------------
         // create command context
         // ---------------------------------------------------------------------
-        createContext : function() {
-            return {
+        createContext : function(obj) {
+            return $.extend({
                 element : this.element,
                 editor : this
-            };
+            },obj);
         },
 
         // ---------------------------------------------------------------------
@@ -242,7 +242,7 @@
         handle : function(element, event) {
 
             var self = this;
-            self.element = $(element);
+            //self.element = $(element);
             var command;            
             var key = null;
             
@@ -299,18 +299,26 @@
         // ---------------------------------------------------------------------
         // execute command
         // ---------------------------------------------------------------------
-        executeCommand : function(command) {
+        executeCommand : function(command,pushOnStack) {
             
             // execute command
             try{
+                if(command.setParameters){
+                    command.setParameters();    
+                }                
                 command.execute();    
             }catch(e){
                 alert(e);
                 return;
             }
-            
+                        
             // if undo is immpossible -> return
             if(command.undo===commands.Command.prototype.undo){
+                return;
+            }
+            
+            // check whether command shall be pushed
+            if(arguments.length>=2 && !pushOnStack){
                 return;
             }
             
@@ -423,10 +431,7 @@
             var parameters = parts.slice(1);
 
             // create command
-            var command = new commandClass(self.createContext());
-            if (command.setParameters) {
-                command.setParameters(parameters);
-            }
+            var command = new commandClass(self.createContext({parameters:parameters}));
 
             // update history
             if (this.autocompleteList.indexOf(commandLine) === -1) {
