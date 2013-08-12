@@ -71,8 +71,6 @@ var readBody = function(request, callback) {
 	});
 };
 
-var postLock = false;
-
 var handlePost = function(request, response) {
 
 	var params = url.parse(request.url, true);

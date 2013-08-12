@@ -10,9 +10,9 @@
     // =========================================================================
     // packages
     // =========================================================================
-    var core = global.jsedit.core;
-    global.jsedit.commands = {};
-    var commands = global.jsedit.commands;
+    var core = global.mero.core;
+    global.mero.commands = {};
+    var commands = global.mero.commands;
     var module = commands;
 
     module.editableElement = '<span tabindex=1 contenteditable="true"></span>';
@@ -94,6 +94,13 @@
         this.editor.setElement(newElement);
     };
 
+    // =========================================================================
+    // delete base command
+    // =========================================================================
+    module.DeleteBaseCommand = core.createDerivedClass(module.Command, {
+        undo : undoDeletion
+    });
+    
     // =========================================================================
     // insert base command
     // =========================================================================
@@ -377,7 +384,7 @@
         doc : 'Paste buffer after focused element.',
         group : 'Tools',
         execute : function() {
-            this.insertElement = this.editor.copyElement.clone(false);
+            this.insertElement = this.copyElement.clone(false);
             this.insert();
             this.editor.assignHandlers(this.insertElement);
             this.editor.setElement(this.insertElement);
@@ -387,7 +394,7 @@
     // =========================================================================
     // cut
     // =========================================================================
-    module.CutCommand = core.createDerivedClass(module.Command, {
+    module.CutCommand = core.createDerivedClass(module.DeleteBaseCommand, {
         name : 'cut',
         char : 'x',
         button : 'cut',
@@ -398,8 +405,7 @@
             this.editor.copyElement = this.element;
             this.element.remove();
             this.editor.setElement(newElement);
-        },
-        undo : undoDeletion
+        }
     });
 
     // =========================================================================
@@ -428,8 +434,6 @@
                 return;
             }
 
-            // save old buffer
-            var copyElement = this.editor.copyElement;
  
             // loop at all preceding cut commands
             this.commands = [];
@@ -440,20 +444,17 @@
                     break;
                 }
                 var paste = new module.PasteCommand(this.editor.createContext());
+                paste.copyElement = command.element;
                 if(first){
                     paste.insertMode = this.insertMode;
                     first=false;
                 }else{
                     paste.insertMode = 'before';
                 }                
-                this.editor.copyElement = command.element;
                 this.editor.executeCommand(paste,false);
                 this.commands.push(paste);
             }
             
-            // restore buffer
-            this.editor.copyElement = copyElement;
-
         },
 
         undo : function() {
@@ -486,7 +487,7 @@
     // =========================================================================
     // delete
     // =========================================================================
-    module.DeleteCommand = core.createDerivedClass(module.Command, {
+    module.DeleteCommand = core.createDerivedClass(module.DeleteBaseCommand, {
         name : 'del',
         char : 'd',
         button : 'del',
@@ -497,8 +498,7 @@
             var newElement = this.nextElement();
             this.element.remove();
             this.editor.setElement(newElement);
-        },
-        undo : undoDeletion
+        }
     });
 
     // =========================================================================
@@ -604,8 +604,6 @@
     // -------------------------------------------------------------------------
     // =========================================================================
 
-
- 
     // =========================================================================
     // link
     // =========================================================================

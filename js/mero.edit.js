@@ -10,10 +10,10 @@
     // =========================================================================
     // packages
     // =========================================================================
-    global.jsedit.edit = {};
-    var edit = global.jsedit.edit;
-    var core = global.jsedit.core;
-    var commands = global.jsedit.commands;
+    global.mero.edit = {};
+    var edit = global.mero.edit;
+    var core = global.mero.core;
+    var commands = global.mero.commands;
 
     // =========================================================================
     // editor
@@ -187,6 +187,7 @@
         createContext : function(obj) {
             return $.extend({
                 element : this.element,
+                copyElement : this.copyElement,
                 editor : this
             },obj);
         },

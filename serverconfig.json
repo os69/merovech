@@ -1,0 +1,7 @@
+{ 
+   address : "localhost",
+   port    : 50000,
+   loadPaths : [".","doc"],
+   savePath : "doc"
+}
+

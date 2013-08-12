@@ -10,10 +10,10 @@
     // =========================================================================
     // packages
     // =========================================================================
-    var core = global.jsedit.core;
-    var commands = global.jsedit.commands;
-    global.jsedit.help = {};
-    var module = global.jsedit.help;
+    var core = global.mero.core;
+    var commands = global.mero.commands;
+    global.mero.help = {};
+    var module = global.mero.help;
 
     // =========================================================================
     // helper for generating html table
@@ -154,7 +154,7 @@
                     // keyboard shortcut
                     var shortcut = this.shortcut();
                     if (shortcut) {
-                        this.containerNode.append("<p class='section'>Keyboard Shortcut</p>");
+                        this.containerNode.append("<p class='section'>Keyboard Shortcut:</p>");
                         this.containerNode.append("<p>" + shortcut + "</p>");
                     }
 

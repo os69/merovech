@@ -8,9 +8,9 @@
     // =========================================================================
     // packages
     // =========================================================================
-    global.jsedit = {};
-    global.jsedit.core = {};
-    var core = global.jsedit.core;
+    global.mero = {};
+    global.mero.core = {};
+    var core = global.mero.core;
 
     // =========================================================================
     // helper: create object with prototype

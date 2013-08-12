@@ -1,7 +1,0 @@
-{ 
-   address : "wdfd00276297a",
-   port    : 50000,
-   loadPaths : ["."],
-   savePath : "."
-}
-
