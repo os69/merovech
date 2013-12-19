@@ -82,11 +82,11 @@
                 var descr;
                 if (this.command.prototype.doc) {
                     descr = this.command.prototype.doc;
-                    parentNode.append("<p class='section'>Description:<p>");
+                    parentNode.append("<b class='section'>Description:<b>");
                     parentNode.append("<p>" + descr + "</p>");
                 } else if (this.command.prototype instanceof commands.InsertNewElementCommand) {
                     descr = "Insert tag '" + this.command.prototype.name + "'.";
-                    parentNode.append("<p class='section'>Description:<p>");
+                    parentNode.append("<b class='section'>Description:<b>");
                     parentNode.append("<p>" + descr + "</p>");
                 }
 
@@ -95,7 +95,7 @@
             renderOptions: function (parentNode) {
                 if (this.command.prototype instanceof commands.InsertBaseCommand) {
 
-                    parentNode.append("<p class='section'>Insertion options:</p>");
+                    parentNode.append("<b class='section'>Insertion options:</b>");
                     var table = module.Table(parentNode);
                     table.addLine(["after", "Inserts new element after focused dom element."]);
                     table.addLine(["before", "Inserts new element before focused dom element."]);
@@ -108,7 +108,7 @@
                 }
                 if (this.command.prototype instanceof commands.InsertNewElementCommand) {
                     if (this.command.prototype.switchEditable) {
-                        parentNode.append("<p class='section'>Container options:</p>");
+                        parentNode.append("<b class='section'>Container options:</b>");
                         table = module.Table(parentNode);
                         //table.addLine([ "editable", "New element is inserted as a contenteditable element which cannot have child elements." ]);
                         //table.addLine([ "not-editable",
@@ -123,7 +123,7 @@
                             parentNode.append("<p>Default is 'container'.</p>");
                         }
                     } else {
-                        parentNode.append("<p class='section'>Container options:</p>");
+                        parentNode.append("<b class='section'>Container options:</b>");
                         if (this.command.prototype.editable) {
                             // 3 span
                             parentNode.append("<p>Element is directly editable. It cannot have child elements.</p>");
@@ -150,13 +150,13 @@
                 this.containerNode.append("<a id=\"" + this.command.prototype.name + "\"></a><h2>Command " + this.command.prototype.name + "</h2>");
 
                 // synopsis
-                this.containerNode.append("<p class='section'>Synopsis:</p>");
+                this.containerNode.append("<b class='section'>Synopsis:</b>");
                 this.containerNode.append("<p>" + this.synopsis() + "</p>");
 
                 // keyboard shortcut
                 var shortcut = this.shortcut();
                 if (shortcut) {
-                    this.containerNode.append("<p class='section'>Keyboard Shortcut:</p>");
+                    this.containerNode.append("<b class='section'>Keyboard Shortcut:</b>");
                     this.containerNode.append("<p>" + shortcut + "</p>");
                 }
 
@@ -165,7 +165,7 @@
 
                 // parameters
                 if (this.command.prototype.parameterDoc) {
-                    this.containerNode.append("<p class='section'>Parameters:</p>");
+                    this.containerNode.append("<b class='section'>Parameters:</b>");
                     var parameterDoc = this.command.prototype.parameterDoc;
                     var tableParagraph = $("<p></p>");
                     this.containerNode.append(tableParagraph);

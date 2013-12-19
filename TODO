@@ -7,3 +7,4 @@ chrome test
 chrome app
 attribute editor
 
+generate docu $(".help-container").html()
