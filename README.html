@@ -173,10 +173,10 @@
 </div>
 
 <div id="commandreference">
-    <a id="Navigation"></a>
+    <a name="Navigation"></a>
     <h1>Navigation Commands</h1>
     <div class="command-container">
-        <a id="prev"></a>
+        <a name="prev"></a>
         <h2>Command prev</h2>
         <b class="section">Synopsis:</b>
         <p>prev</p>
@@ -188,7 +188,7 @@
         <p>Move focus to preceding dom element.</p>
     </div>
     <div class="command-container">
-        <a id="next"></a>
+        <a name="next"></a>
         <h2>Command next</h2>
         <b class="section">Synopsis:</b>
         <p>next</p>
@@ -200,7 +200,7 @@
         <p>Move focus to next dom element.</p>
     </div>
     <div class="command-container">
-        <a id="parent"></a>
+        <a name="parent"></a>
         <h2>Command parent</h2>
         <b class="section">Synopsis:</b>
         <p>parent</p>
@@ -212,7 +212,7 @@
         <p>Move focus to parent dom element.</p>
     </div>
     <div class="command-container">
-        <a id="child"></a>
+        <a name="child"></a>
         <h2>Command child</h2>
         <b class="section">Synopsis:</b>
         <p>child</p>
@@ -221,10 +221,10 @@
         </b>
         <p>Move focus to first child.</p>
     </div>
-    <a id="Tools"></a>
+    <a name="Tools"></a>
     <h1>Tools Commands</h1>
     <div class="command-container">
-        <a id="copy"></a>
+        <a name="copy"></a>
         <h2>Command copy</h2>
         <b class="section">Synopsis:</b>
         <p>copy</p>
@@ -236,7 +236,7 @@
         <p>Copy focused element to buffer.</p>
     </div>
     <div class="command-container">
-        <a id="paste"></a>
+        <a name="paste"></a>
         <h2>Command paste</h2>
         <b class="section">Synopsis:</b>
         <p>paste [prepend|append|before|after]</p>
@@ -270,7 +270,7 @@
         <p>Default is 'after'.</p>
     </div>
     <div class="command-container">
-        <a id="cut"></a>
+        <a name="cut"></a>
         <h2>Command cut</h2>
         <b class="section">Synopsis:</b>
         <p>cut</p>
@@ -282,7 +282,7 @@
         <p>Cut focused element.</p>
     </div>
     <div class="command-container">
-        <a id="uncut"></a>
+        <a name="uncut"></a>
         <h2>Command uncut</h2>
         <b class="section">Synopsis:</b>
         <p>uncut [prepend|append|before|after]</p>
@@ -314,7 +314,7 @@
         <p>Default is 'before'.</p>
     </div>
     <div class="command-container">
-        <a id="undo"></a>
+        <a name="undo"></a>
         <h2>Command undo</h2>
         <b class="section">Synopsis:</b>
         <p>undo</p>
@@ -326,7 +326,7 @@
         <p>Undo of DOM operations (insertion, deletion, ... of DOM nodes).</p>
     </div>
     <div class="command-container">
-        <a id="del"></a>
+        <a name="del"></a>
         <h2>Command del</h2>
         <b class="section">Synopsis:</b>
         <p>del</p>
@@ -338,7 +338,7 @@
         <p>Delete focused element</p>
     </div>
     <div class="command-container">
-        <a id="attr"></a>
+        <a name="attr"></a>
         <h2>Command attr</h2>
         <b class="section">Synopsis:</b>
         <p>attr</p>
@@ -348,7 +348,7 @@
         <p>Opens a dialog for editing the attributes of the focused element.</p>
     </div>
     <div class="command-container">
-        <a id="static"></a>
+        <a name="static"></a>
         <h2>Command static</h2>
         <b class="section">Synopsis:</b>
         <p>static</p>
@@ -357,10 +357,10 @@
         </b>
         <p>Disable editor function an switch to static HTML. This is useful for copying marked text.</p>
     </div>
-    <a id="Load &amp; Save"></a>
+    <a name="Load &amp; Save"></a>
     <h1>Load &amp; Save Commands</h1>
     <div class="command-container">
-        <a id="load"></a>
+        <a name="load"></a>
         <h2>Command load</h2>
         <b class="section">Synopsis:</b>
         <p>load [
@@ -386,7 +386,7 @@
         </p>
     </div>
     <div class="command-container">
-        <a id="save"></a>
+        <a name="save"></a>
         <h2>Command save</h2>
         <b class="section">Synopsis:</b>
         <p>save [
@@ -411,10 +411,10 @@
             </table>
         </p>
     </div>
-    <a id="General"></a>
+    <a name="General"></a>
     <h1>General Commands</h1>
     <div class="command-container">
-        <a id="link"></a>
+        <a name="link"></a>
         <h2>Command link</h2>
         <b class="section">Synopsis:</b>
         <p>link
@@ -474,7 +474,7 @@
         <p>Default is 'leaf'.</p>
     </div>
     <div class="command-container">
-        <a id="img"></a>
+        <a name="img"></a>
         <h2>Command img</h2>
         <b class="section">Synopsis:</b>
         <p>img
@@ -529,7 +529,7 @@
         <p>Element is not direclty editable. It is a simple element which cannot have child elements.</p>
     </div>
     <div class="command-container">
-        <a id="h1"></a>
+        <a name="h1"></a>
         <h2>Command h1</h2>
         <b class="section">Synopsis:</b>
         <p>h1 [prepend|append|before|after] [container|leaf]</p>
@@ -575,7 +575,7 @@
         <p>Default is 'leaf'.</p>
     </div>
     <div class="command-container">
-        <a id="h2"></a>
+        <a name="h2"></a>
         <h2>Command h2</h2>
         <b class="section">Synopsis:</b>
         <p>h2 [prepend|append|before|after] [container|leaf]</p>
@@ -621,7 +621,7 @@
         <p>Default is 'leaf'.</p>
     </div>
     <div class="command-container">
-        <a id="h3"></a>
+        <a name="h3"></a>
         <h2>Command h3</h2>
         <b class="section">Synopsis:</b>
         <p>h3 [prepend|append|before|after] [container|leaf]</p>
@@ -667,7 +667,7 @@
         <p>Default is 'leaf'.</p>
     </div>
     <div class="command-container">
-        <a id="div"></a>
+        <a name="div"></a>
         <h2>Command div</h2>
         <b class="section">Synopsis:</b>
         <p>div [prepend|append|before|after] [container|leaf]</p>
@@ -713,7 +713,7 @@
         <p>Default is 'leaf'.</p>
     </div>
     <div class="command-container">
-        <a id="pre"></a>
+        <a name="pre"></a>
         <h2>Command pre</h2>
         <b class="section">Synopsis:</b>
         <p>pre [prepend|append|before|after] [container|leaf]</p>
@@ -759,7 +759,7 @@
         <p>Default is 'leaf'.</p>
     </div>
     <div class="command-container">
-        <a id="bold"></a>
+        <a name="bold"></a>
         <h2>Command bold</h2>
         <b class="section">Synopsis:</b>
         <p>bold [prepend|append|before|after] [container|leaf]</p>
@@ -805,7 +805,7 @@
         <p>Default is 'leaf'.</p>
     </div>
     <div class="command-container">
-        <a id="span"></a>
+        <a name="span"></a>
         <h2>Command span</h2>
         <b class="section">Synopsis:</b>
         <p>span [prepend|append|before|after]</p>
@@ -839,7 +839,7 @@
         <p>Element is directly editable. It cannot have child elements.</p>
     </div>
     <div class="command-container">
-        <a id="paragraph"></a>
+        <a name="paragraph"></a>
         <h2>Command paragraph</h2>
         <b class="section">Synopsis:</b>
         <p>paragraph [prepend|append|before|after] [container|leaf]</p>
@@ -885,7 +885,7 @@
         <p>Default is 'leaf'.</p>
     </div>
     <div class="command-container">
-        <a id="italic"></a>
+        <a name="italic"></a>
         <h2>Command italic</h2>
         <b class="section">Synopsis:</b>
         <p>italic [prepend|append|before|after] [container|leaf]</p>
@@ -931,7 +931,7 @@
         <p>Default is 'leaf'.</p>
     </div>
     <div class="command-container">
-        <a id="icon"></a>
+        <a name="icon"></a>
         <h2>Command icon</h2>
         <b class="section">Synopsis:</b>
         <p>icon
@@ -978,10 +978,10 @@
         <b class="section">Container options:</b>
         <p>Element is not direclty editable. It is a simple element which cannot have child elements.</p>
     </div>
-    <a id="Lists"></a>
+    <a name="Lists"></a>
     <h1>Lists Commands</h1>
     <div class="command-container">
-        <a id="ol"></a>
+        <a name="ol"></a>
         <h2>Command ol</h2>
         <b class="section">Synopsis:</b>
         <p>ol [prepend|append|before|after]</p>
@@ -1015,7 +1015,7 @@
         <p>Element is not direclty editable. The element can have child elements which may be directly editable. By default a editable SPAN element is inserted</p>
     </div>
     <div class="command-container">
-        <a id="ul"></a>
+        <a name="ul"></a>
         <h2>Command ul</h2>
         <b class="section">Synopsis:</b>
         <p>ul [prepend|append|before|after]</p>
@@ -1049,7 +1049,7 @@
         <p>Element is not direclty editable. The element can have child elements which may be directly editable. By default a editable SPAN element is inserted</p>
     </div>
     <div class="command-container">
-        <a id="li"></a>
+        <a name="li"></a>
         <h2>Command li</h2>
         <b class="section">Synopsis:</b>
         <p>li [prepend|append|before|after|sibling] [container|leaf]</p>
@@ -1100,10 +1100,10 @@
         </table>
         <p>Default is 'container'.</p>
     </div>
-    <a id="Tables"></a>
+    <a name="Tables"></a>
     <h1>Tables Commands</h1>
     <div class="command-container">
-        <a id="table"></a>
+        <a name="table"></a>
         <h2>Command table</h2>
         <b class="section">Synopsis:</b>
         <p>table [prepend|append|before|after]</p>
@@ -1137,7 +1137,7 @@
         <p>Element is not direclty editable. The element can have child elements which may be directly editable. By default a editable SPAN element is inserted</p>
     </div>
     <div class="command-container">
-        <a id="tr"></a>
+        <a name="tr"></a>
         <h2>Command tr</h2>
         <b class="section">Synopsis:</b>
         <p>tr [prepend|append|before|after]</p>
@@ -1171,7 +1171,7 @@
         <p>Element is not direclty editable. The element can have child elements which may be directly editable. By default a editable SPAN element is inserted</p>
     </div>
     <div class="command-container">
-        <a id="td"></a>
+        <a name="td"></a>
         <h2>Command td</h2>
         <b class="section">Synopsis:</b>
         <p>td [prepend|append|before|after] [container|leaf]</p>

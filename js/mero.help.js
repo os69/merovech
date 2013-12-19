@@ -147,7 +147,7 @@
                 this.parentNode.append(this.containerNode);
 
                 // heading
-                this.containerNode.append("<a id=\"" + this.command.prototype.name + "\"></a><h2>Command " + this.command.prototype.name + "</h2>");
+                this.containerNode.append("<a name=\"" + this.command.prototype.name + "\"></a><h2>Command " + this.command.prototype.name + "</h2>");
 
                 // synopsis
                 this.containerNode.append("<b class='section'>Synopsis:</b>");
@@ -241,7 +241,7 @@
         // render groups
         var commandReferenceNode = $("#commandreference");
         for (var groupName in groups) {
-            commandReferenceNode.append("<a id=\"" + groupName + "\"></a><h1>" + groupName + " Commands</h1>");
+            commandReferenceNode.append("<a name=\"" + groupName + "\"></a><h1>" + groupName + " Commands</h1>");
             var commandList = groups[groupName];
             for (var i = 0; i < commandList.length; ++i) {
                 command = commandList[i];
