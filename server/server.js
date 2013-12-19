@@ -102,4 +102,6 @@ server = http.createServer(function(request, response) {
 var configString = fs.readFileSync(process.argv[2],"utf8");
 eval("var config="+configString);
 
+console.log("Server hostname :",config.address);
+console.log("Server port     :",config.port);
 server.listen(config.port, config.address);

@@ -61,7 +61,7 @@
                             synopsis += " [prepend|append|before|after]";
                         }
                         if (this.command.prototype.switchEditable) {
-                            synopsis += " [editable|not-editable]";
+                            synopsis += " [container|leaf]";
                         }
                     }
                     return synopsis;
@@ -104,34 +104,36 @@
                         if (this.command.prototype.siblingType) {
                             table.addLine([ "sibling", "Inserts new element as a sibling of next '" + this.command.prototype.siblingType + "' element." ]);
                         }
-                        parentNode.append("<p>Default is " + this.command.prototype.insertMode + ".</p>");
+                        parentNode.append("<p>Default is '" + this.command.prototype.insertMode + "'.</p>");
                     }
                     if (this.command.prototype instanceof commands.InsertNewElementCommand) {
                         if (this.command.prototype.switchEditable) {
-                            parentNode.append("<p class='section'>Editable options:</p>");
+                            parentNode.append("<p class='section'>Container options:</p>");
                             table = module.Table(parentNode);
-                            table.addLine([ "editable", "New element is inserted as a contenteditable element which cannot have child elements." ]);
-                            table.addLine([ "not-editable",
-                                    "New element is inserted as a NOT contenteditable element. By default a contenteditable child element of type span is created." ]);
+                            //table.addLine([ "editable", "New element is inserted as a contenteditable element which cannot have child elements." ]);
+                            //table.addLine([ "not-editable",
+                            //        "New element is inserted as a NOT contenteditable element. By default a contenteditable child element of type span is created." ]);
+                            table.addLine([ "leaf", "New element is inserted as a direclty editable leaf element. The leaf element cannot have child elements." ]);
+                            table.addLine([ "container", "New element is inserted as a container which can have child elements. By default an editable SPAN child element is created." ]);
                             if(this.command.prototype.editable){
                                 // 1 h1, div
-                                parentNode.append("<p>Default is editable.</p>");    
+                                parentNode.append("<p>Default is 'leaf'.</p>");    
                             }else{
                                 // 2 li
-                                parentNode.append("<p>Default is not-editable.</p>");
+                                parentNode.append("<p>Default is 'container'.</p>");
                             }                            
                         }else{
-                            parentNode.append("<p class='section'>Editable:</p>");
+                            parentNode.append("<p class='section'>Container options:</p>");
                             if(this.command.prototype.editable){
                                 // 3 span
-                                parentNode.append("<p>Element is inserted as contenteditable which cannot have child elements.</p>");    
+                                parentNode.append("<p>Element is directly editable. It cannot have child elements.</p>");    
                             }else{
                                 if(this.command.prototype.container){
                                     // 4 tr
-                                    parentNode.append("<p>Element is inserted as not contenteditable. Element is a container which has child elements.</p>");    
+                                    parentNode.append("<p>Element is not direclty editable. The element can have child elements which may be directly editable. By default a editable SPAN element is inserted</p>");    
                                 }else{
                                     // 5 img
-                                    parentNode.append("<p>Element is inserted as not contenteditable. It is a simple element which cannot have child elements.</p>");
+                                    parentNode.append("<p>Element is not direclty editable. It is a simple element which cannot have child elements.</p>");
                                 }                                
                             }                            
                             

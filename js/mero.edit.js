@@ -43,7 +43,7 @@
             this.toolbarDiv.append(this.inputForm);
 
             // create command input field
-            this.commandInput = $("<input class='span2' type='text' style='margin-right:10px'></input>");
+            this.commandInput = $("<input class='span2' type='text' style='margin-right:10px;width:100px;'></input>");
             this.inputForm.append(this.commandInput);
             this.commandInput.keydown(function(event) {
                 self.handleCommandInputKey(event);
@@ -58,14 +58,14 @@
             });
 
             // create css status field
-            this.cssInput = $("<input class='span2' type='text'></input>");
+            this.cssInput = $("<input class='span2' type='text' style='width:50px;'></input>");
             this.inputForm.append(this.cssInput);
             this.cssInput.keydown(function(event) {
                 self.handleCssInputKey(event);
             });
 
             // toolbar status field
-            this.statusSpan = $("<span class='' style='width:200px;float:left;margin-top:10px'>DIV</span>");
+            this.statusSpan = $("<span class='' style='width:400px;float:left;margin-top:10px'>DIV</span>");
             this.toolbarDiv.append(this.statusSpan);
 
             // toolbar buttons
@@ -356,7 +356,7 @@
                         self.element.focus();                        
                     }
                 }else{
-                    if(self.element.get(0).tagName === 'SPAN' && self.element.text()===""){
+                    if(self.element.get(0).tagName === 'SPAN' || self.element.text()===""){
                         var editableElement = $(commands.editableElement);
                         editableElement.text("span");
                         self.element.append(editableElement);
@@ -446,47 +446,6 @@
             // and execute
             self.executeCommand(command);
 
-        },
-
-        // ---------------------------------------------------------------------
-        // execute command
-        // ---------------------------------------------------------------------
-        executeCommandOld : function() {
-            var self = this;
-            var commandString = self.commandInput.val();
-            var commands = commandString.split(" ");
-            var newElement = null;
-            switch (commands[0]) {
-            case 'table':
-                var e = $("<table tabindex=1 ><tbody tabindex=1><tr tabindex=1><td tabindex=1><div tabindex=1 contenteditable='true'>x</div></td></tr></tbody></table>");
-                self.assignHandlers(e);
-                this.element.after(e);
-                newElement = e;
-                break;
-            case 'tr':
-                e = $("<tr tabindex=1><td tabindex=1><div tabindex=1 contenteditable='true'>x</div></td></tr>");
-                this.assignHandlers(e);
-                this.element.after(e);
-                newElement = e;
-                break;
-            case 'td':
-                e = $("<td tabindex=1><div tabindex=1 contenteditable='true'>x</div></td>");
-                this.assignHandlers(e);
-                this.element.after(e);
-                newElement = e;
-                break;
-            default:
-                return;
-            }
-            if (this.autocompleteList.indexOf(commandString) === -1) {
-                this.autocompleteList.push(commandString);
-            }
-            this.commandInput.val("");
-            if (newElement && newElement.length > 0) {
-                self.element = newElement;
-                self.status.text(self.element.get(0).tagName);
-            }
-            self.element.focus();
         },
 
         // --------------------------------------------------------------------
