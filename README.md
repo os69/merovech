@@ -9,6 +9,10 @@
     </p>
     <p></p>
     <p>
+        <a href="#Technology">Technology</a>
+    </p>
+    <p></p>
+    <p>
         <a href="#Browser Support">Browser Support</a>
     </p>
     <p></p>
@@ -149,29 +153,193 @@
         </li>
     </ul>
 </div>
-<div>
-    <a name="Introduction"></a>
-    <h1>Introduction</h1>
-    <i>Merowech</i>is a HTML WYSIWYG DOM tree editor:
-    <ul>
-        <li>Edit HTML in your browser.</li>
-        <li>It is WYSIWYG because you can see the result directly.</li>
-        <li>The DOM tree is not hidden from the user. Actually you edit the DOM directly. Also the DOM tree is esential for navigation within
-            <i>Merowech</i>.
-        </li>
-    </ul>
-    <i>Merowech</i>originated from the need of a personal wiki. I tested some of the available solutions but found that the process of (1) editing wiki markup (2) change mode and then view the result HTML page does not make sense for a personal wiki. For a personal note taking software I would prefer WYSIWYG. On the other hand I like technical markup languages (HTML, markdown) because they are very precise and allow you to do a lot of more things than in a WYSIWYG editor. So would it be possible to combine the technical approach of markup languages with the WYSIWYG approach?
-    <i>Merovech</i>tries to do this. Modern browsers support editing of DOM nodes.
+
+<a name="Introduction"></a>
+<h1>Introduction</h1>
+<i>Merowech</i>
+is a HTML WYSIWYG DOM tree editor:
+<ul>
+    <li>Edit HTML documents in your browser.</li>
+    <li>It is WYSIWYG because you can see the result directly.</li>
+    <li>On the other hand
+        <i>Merowech</i>
+        is also very technical. The DOM tree is not hidden from the user which does allow you to make use of the all HTML features.</li>
+    <li>Navigation is based on the DOM tree. You can navigate to the next or the previous sibling of an element or to parent or child elements.</li>
+</ul>
+
+<p>
+    <i>Merowech</i>
+    originated from the need of a personal wiki. I tested some of the available solutions but found that the process of (1) editing wiki markup (2) change mode and then view the result HTML page does not make sense for a personal wiki.
+</p>
+
+<p>
+    For a personal note taking software I would prefer WYSIWYG. On the other hand I like technical markup languages (HTML, markdown) because they are very precise and allow you to do a lot of more things than in a WYSIWYG editor.
+</p>
+
+<p>
+    So would it be possible to combine the technical approach of markup languages with the WYSIWYG approach?
+</p>
+
+<p>
+    <i>Merovech</i>
+    tries to do this.
+</p>
+
+<p>Modern browsers support editing of DOM nodes.
     <i>Merovech</i>
     uses this functionality to allow editing of simple text in the browser.
-    <i>Merovech</i>adds functionality for navigating the DOM. By the (Alt+) cursor keys you can move to th enext/previous/parent/child node of a DOM node. Also functionalities for copying, cutting, deleting DOM nodes are supported. viewing the rendered result page
-    <h1>Installation</h1>
-    <h1>Browser Support</h1>
-    <h1>General Usage Concepts</h1>
-    <h2>Navigation</h2>
-    <h2>Executing Commands</h2>
-</div>
+    <i>Merovech</i>
+    adds functionality for navigating the DOM. By the (Alt+) cursor keys you can move to th enext/previous/parent/child node of a DOM node. Also functionalities for copying, cutting, deleting DOM nodes are supported. viewing the rendered result page.
+</p>
 
+<a name="Installation"></a>
+<h1>Installation</h1>
+<h2>Using Included Node-Webserver</h2>
+<ol>
+    <li>Download and extract the
+        <a href="https://github.com/os69/merovech/archive/master.zip">archive</a>. Or clone the git repository by
+        <pre>git clone https://github.com/os69/merovech
+        </pre>
+    </li>
+    <li>
+        Switch to the
+        <i>Merovech</i>
+        directory and start the server by
+        <pre>node server/server.js serverconfig.json
+        </pre>
+        Precondition is that you have
+        <a href="http://nodejs.org/">node.js</a>
+        installed. In the serverconfig.json configuration file you can adjust some parameters of the web servers
+        <pre>{ address : "localhost", port : 50000, loadPaths : [".","doc"], savePath : "doc" }
+        </pre>
+        <table>
+            <tbody>
+                <tr>
+                    <td>address</td>
+                    <td>Server address.</td>
+                </tr>
+                <tr>
+                    <td>port</td>
+                    <td>Port on which the server will listen.</td>
+                </tr>
+                <tr>
+                    <td>loadPaths</td>
+                    <td>List of paths where the server os searching for documents.</td>
+                </tr>
+                <tr>
+                    <td>savePath</td>
+                    <td>Path were documents are stored.</td>
+                </tr>
+            </tbody>
+        </table>
+    </li>
+    <li>
+        Open
+        <a href="http://localhost:50000/mero.html?page=doc1">http://localhost:50000/mero.html?page=doc1</a>in your Webbrowser.
+    </li>
+</ol>
+<h2>Using Own Webserver</h2>
+You can use
+<i>Merovech</i>
+also with other web servers. Just deploy the
+<i>Merovech</i>
+directory to the www directory of your web server. For saving documents the web browser does need to support POST requests.
+
+<a name="Technology"></a>
+<h1>Technology</h1>
+<i>Merovech</i>
+is implemented in Javascript and runs in the browser.
+
+<a name="Browser Support"></a>
+<h1>Browser Support</h1>
+<i>Merovech</i>
+supports Firefox and Chrome.
+
+<a name="General Usage Concepts"></a>
+<h1>General Usage Concepts</h1>
+
+<a name="Navigation"></a>
+<h2>Navigation</h2>
+In the first section of the test document
+<i>doc1</i>
+you can see some nested divs. Click on a div. Now you can navigate by
+<table>
+    <tbody>
+        <tr>
+            <td>Alt+CursorLeft</td>
+            <td>Previous sibling element.</td>
+        </tr>
+        <tr>
+            <td>Alt+CursorRight</td>
+            <td>Next sibling element.</td>
+        </tr>
+        <tr>
+            <td>Alt+Up</td>
+            <td>Parent element.</td>
+        </tr>
+        <tr>
+            <td>Alt+Down</td>
+            <td>First child element.</td>
+        </tr>
+    </tbody>
+</table>
+
+<a name="Executing Commands"></a>
+<h2>Executing Commands</h2>
+<ul>
+    <li>Type
+        <i>Escape</i>
+        key</li>
+    <li>Cursor is now in the command field (upper left corner).</li>
+    <li>Enter command. For instance
+        <i>h1</i>.</li>
+    <li>Type
+        <i>Enter</i>. A new H1-Element is inserted.</li>
+</ul>
+
+<h2>Editable versus Container Elements</h2>
+<p>Typically whenever you insert a new element, the element is inserted as a editable element. Editable does mean that you can insert text. Editable elements cannot have child elements.</p>
+<p>In case you want an element to have child elements append the option
+    <i>container</i>
+    to the insert command. In case you use the
+    <i>container</i>
+    option the desired element is created and in addition an editable SPAN child element. Example:</p>
+<pre>div container
+</pre>
+
+<h2>Insertion Position</h2>
+By default new elements are inserted after the current element. You can change this by the following options:
+<table>
+    <tbody>
+        <tr>
+            <td>after</td>
+            <td>Insert after current element.</td>
+        </tr>
+        <tr>
+            <td>before</td>
+            <td>Insert before current element.</td>
+        </tr>
+        <tr>
+            <td>append</td>
+            <td>Append new element as last child of current element.</td>
+        </tr>
+        <tr>
+            <td>preend</td>
+            <td>Append new element as first child of current element.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Copy &amp; Paste</h2>
+<p>Within an editable element you can use the default keyboard shortcuts CTRL-C, CTRL-V.</p>
+<p>In addition using ALT-C, ALT-V you can copy complete DOM elements.</p>
+<p>In case you want to move or copy many DOM elements:
+</p>
+<ul>
+    <li>Use the cut command several times.</li>
+    <li>Use the uncut command to paste all cut elements.</li>
+</ul>
+<p></p>
 <div id="commandreference">
     <a name="Navigation"></a>
     <h1>Navigation Commands</h1>

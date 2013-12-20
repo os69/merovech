@@ -344,7 +344,7 @@
         doc: 'Move focus to first child.',
         group: 'Navigation',
         execute: function () {
-            if(this.element.attr("contenteditable")==="true"){
+            if (this.element.attr("contenteditable") === "true") {
                 return;
             }
             var newElement = this.element.children(":first-child");
@@ -367,6 +367,7 @@
         group: 'Tools',
         execute: function () {
             this.editor.copyElement = this.element;
+            this.editor.element.focus();
         }
     });
 
@@ -519,6 +520,10 @@
                 fields: fields,
                 title: 'Attributes'
             }, function (delta) {
+                if (!delta) {
+                    self.editor.setElement(self.editor.element);
+                    return;
+                }
                 for (var i = 0; i < delta.addedFields.length; ++i) {
                     var field = delta.addedFields[i];
                     self.element.attr(field.name, field.value);
@@ -531,6 +536,7 @@
                     var field = delta.changedFields[i];
                     self.element.attr(field.name, field.newValue);
                 }
+                self.editor.setElement(self.editor.element);
             });
         }
     });
@@ -543,7 +549,7 @@
         char: 'l',
         button: 'load',
         buttonGroup: 'tools',
-        buttonTemplate: 'load <pagename>',
+        buttonTemplate: 'load <enter pagename>',
         doc: 'Load page.',
         synopsis: 'load [<i>pagename</i>]',
         group: 'Load & Save',
@@ -582,6 +588,7 @@
         },
         execute: function () {
             this.editor.savePage(this.pageName);
+            this.editor.element.focus();
         }
     });
 
@@ -617,6 +624,9 @@
         setParameters: function () {
             if (this.parameters.length >= 1) {
                 this.target = this.parameters[0];
+                if (this.target.slice(0, 1) !== '/' && this.target.slice(0, 4) !== 'http') {
+                    this.target = "mero.html?page=" + this.target;
+                }
             } else {
                 throw "Missing parameter target";
             }

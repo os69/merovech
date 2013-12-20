@@ -1,3 +1,4 @@
+neue seite anlegen
 focus on start
 missing tags
 test tags on bootstrap widgets
@@ -7,4 +8,8 @@ chrome test
 chrome app
 attribute editor
 
-generate docu $(".help-container").html()
+generate docu:
+-call help
+-$(".help-container").html()
+-paste to readme.md
+-format readme.md

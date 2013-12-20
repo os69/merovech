@@ -446,8 +446,6 @@
             buttons : [ {
                 text : "Ok",
                 click : function() {
-                    // close dialog
-                    $(this).dialog("close");
                     // transfer values from input fields to object
                     for ( var i = 0; i < options.fields.length; ++i) {
                         var field = options.fields[i];
@@ -455,10 +453,14 @@
                         field.value = field.valueInputField.val();
                     }
                     // delta
-                    var delta = calculateDelta(oldFields, options.fields);
-                    callback(delta);
+                    this.delta = calculateDelta(oldFields, options.fields);        
+                    // close dialog
+                    $(this).dialog("close");                    
                 }
             } ],
+            close: function(){
+              callback(this.delta);  
+            },
             title : options.title,
             width : 600
         });

@@ -116,6 +116,7 @@
                 // async needed if command is choosen from history (don't know why)
                 setTimeout(function(){
                     self.executeCommandLine();    
+                    self.element.focus();
                 },0);                
                 break;
             case 27:
@@ -134,6 +135,7 @@
                 event.preventDefault();
                 var cssClasses = self.cssInput.val();
                 self.element.attr("class", cssClasses);
+                self.element.focus();
                 break;
             case 27:
                 self.element.focus();
@@ -547,13 +549,11 @@
             });
             elements.filter("a").off("dblclick");
             elements.filter("a").dblclick(function() {
-                // window.location.href = $(this).attr("href");
                 var link = $(this).attr("href");
                 window.location = link;
             });
             elements.filter("a").off("click");
             elements.filter("a").click(function() {
-                // window.location.href = $(this).attr("href");
                 var link = $(this).attr("href");
                 window.location = link;
             });
