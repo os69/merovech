@@ -330,16 +330,43 @@ By default new elements are inserted after the current element. You can change t
     </tbody>
 </table>
 
-<h2>Copy &amp; Paste</h2>
+<h2>Copy and Paste</h2>
 <p>Within an editable element you can use the default keyboard shortcuts CTRL-C, CTRL-V.</p>
 <p>In addition using ALT-C, ALT-V you can copy complete DOM elements.</p>
-<p>In case you want to move or copy many DOM elements:
-</p>
+<p>In case you want to move or copy many DOM elements:</p>
 <ul>
     <li>Use the cut command several times.</li>
     <li>Use the uncut command to paste all cut elements.</li>
 </ul>
-<p></p>
+
+<h2>CSS Classes</h2>
+Using the input field right to the command field you can assign CSS classes to elements.
+
+<h2>Attribute dialog</h2>
+Call command
+<i>attr</i>
+on an element to open an dialog which allows you to edit the attributes of an element.
+
+<h2>URL Parameters</h2>
+<i>Merovech</i>
+supports the following URL parameters:
+<table>
+    <tbody>
+        <tr>
+            <td>page=doc1</td>
+            <td>Name of the HTML document.</td>
+        </tr>
+        <tr>
+            <td>css=css/black.css</td>
+            <td>Path to a CSS of LESS stylesheet.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Extend and Customize Commands</h2>
+You can customize the command or add own commands by editing mero.commands.js.
+
+
 <div id="commandreference">
     <a name="Navigation"></a>
     <h1>Navigation Commands</h1>
@@ -599,7 +626,7 @@ By default new elements are inserted after the current element. You can change t
                         <td>
                             <i>target</i>
                         </td>
-                        <td>Target URL.</td>
+                        <td>Target URL or just name of target document for links within Merovech.</td>
                     </tr>
                 </tbody>
             </table>

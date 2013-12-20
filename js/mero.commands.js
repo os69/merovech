@@ -619,7 +619,7 @@
         buttonTemplate: 'link <target>',
         synopsis: 'link <i>target</i>',
         parameterDoc: {
-            'target': 'Target URL.'
+            'target': 'Target URL or just name of target document for links within Merovech.'
         },
         setParameters: function () {
             if (this.parameters.length >= 1) {
