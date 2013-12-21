@@ -366,7 +366,7 @@
         doc: 'Copy focused element to buffer.',
         group: 'Tools',
         execute: function () {
-            this.editor.copyElement = this.element;
+            this.editor.copyElement = this.element.clone(false);
             this.editor.element.focus();
         }
     });
@@ -589,6 +589,30 @@
         execute: function () {
             this.editor.savePage(this.pageName);
             this.editor.element.focus();
+        }
+    });
+
+    // =========================================================================
+    // new
+    // =========================================================================
+    module.NewCommand = core.createDerivedClass(module.Command, {
+        name: 'new',
+        group: 'Load & Save',
+        doc: 'Create new page.',
+        synopsis: 'new <i>pagename</i>',
+        parameterDoc: {
+            'pagename': 'Name of page.'
+        },
+        setParameters: function () {
+            if (this.parameters.length >= 1) {
+                this.pageName = this.parameters[0];
+            }else{
+                alert("Pagename missing!");
+            }
+        },
+        execute: function () {
+            this.editor.createDefaultContent();
+            this.editor.savePage(this.pageName);
         }
     });
 

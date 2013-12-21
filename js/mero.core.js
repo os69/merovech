@@ -1,4 +1,4 @@
-(function(global) {
+(function (global) {
 
     "use strict";
     /*global window */
@@ -15,9 +15,8 @@
     // =========================================================================
     // helper: create object with prototype
     // =========================================================================
-    core.object = function(prototype) {
-        var TmpFunction = function() {
-        };
+    core.object = function (prototype) {
+        var TmpFunction = function () {};
         TmpFunction.prototype = prototype;
         return new TmpFunction();
     };
@@ -25,8 +24,8 @@
     // =========================================================================
     // helper: extend object
     // =========================================================================
-    core.extend = function(o1, o2) {
-        for ( var key in o2) {
+    core.extend = function (o1, o2) {
+        for (var key in o2) {
             o1[key] = o2[key];
         }
         return o1;
@@ -35,9 +34,9 @@
     // =========================================================================
     // helper: generate constructor function
     // =========================================================================
-    var generateConstructorFunction = function() {
+    var generateConstructorFunction = function () {
         var ConstructorFunction = null;
-        ConstructorFunction = function() {
+        ConstructorFunction = function () {
             if (!(this instanceof ConstructorFunction)) {
                 return new ConstructorFunction("blub", arguments);
             }
@@ -55,7 +54,7 @@
     // =========================================================================
     // create class
     // =========================================================================
-    core.createClass = function(prototype) {
+    core.createClass = function (prototype) {
         var Cls = generateConstructorFunction();
         Cls.prototype = prototype;
         return Cls;
@@ -64,7 +63,7 @@
     // =========================================================================
     // create derived class
     // =========================================================================
-    core.createDerivedClass = function(parentClass, prototype) {
+    core.createDerivedClass = function (parentClass, prototype) {
         var Cls = generateConstructorFunction();
         Cls.prototype = core.extend(core.object(parentClass.prototype), prototype);
         return Cls;
@@ -73,8 +72,8 @@
     // =========================================================================
     // copy options
     // =========================================================================
-    core.copyOptions = function(target, source) {
-        for ( var name in source) {
+    core.copyOptions = function (target, source) {
+        for (var name in source) {
             if (source.hasOwnProperty(name)) {
                 target[name] = source[name];
             }
@@ -84,8 +83,8 @@
     // =========================================================================
     // remove list2 elements from list1
     // =========================================================================
-    core.removeElements = function(list1, list2) {
-        for ( var i = 0; i < list2.length; ++i) {
+    core.removeElements = function (list1, list2) {
+        for (var i = 0; i < list2.length; ++i) {
             var index = $.inArray(list2[i], list1);
             if (index >= 0) {
                 list1.splice(index, 1);
@@ -96,10 +95,10 @@
     // =========================================================================
     // name/value dialog
     // =========================================================================
-    core.nameValueDialog = function(options, callback) {
+    core.nameValueDialog = function (options, callback) {
         // construct html of dialog
         var content = $("<table></table>");
-        for ( var i = 0; i < options.fields.length; ++i) {
+        for (var i = 0; i < options.fields.length; ++i) {
             var row = $("<tr></tr>");
             content.append(row);
             var nameCell = $("<td></td>");
@@ -119,24 +118,24 @@
         }
         // dialog widget
         content.dialog({
-            buttons : [ {
-                text : "Ok",
-                click : function() {
+            buttons: [{
+                text: "Ok",
+                click: function () {
                     $(this).dialog("close");
                     callback();
                 }
-            } ],
-            title : options.title
-        // width:"600px"
+            }],
+            title: options.title
+            // width:"600px"
         });
     };
 
     // =========================================================================
     // create map from list
     // =========================================================================
-    core.map = function(list, key) {
+    core.map = function (list, key) {
         var map = {};
-        for ( var i = 0; i < list.length; ++i) {
+        for (var i = 0; i < list.length; ++i) {
             var element = list[i];
             var keyValue = key(element);
             if (!keyValue) {
@@ -148,19 +147,53 @@
     };
 
     // =========================================================================
+    // parse url
+    // =========================================================================
+    core.parseUrl = function (url) {
+        var a = $('<a>', {
+            href: url
+        })[0];
+        return {
+            protocol: a.protocol,
+            hostname: a.hostname,
+            pathname: a.pathname,
+            search: a.search,
+            hash: a.hash
+        };
+    };
+
+    // =========================================================================
+    // get current url
+    // =========================================================================
+    core.getCurrentUrl = function (url) {
+        return {
+            protocol: window.location.protocol,
+            hostname: window.location.hostname,
+            pathname: window.location.pathname,
+            search: window.location.search,
+            hash: window.location.hash
+        };
+    };
+
+    // =========================================================================
     // url manager
     // =========================================================================
     core.url = core.createClass({
 
-        init : function() {
-            this.load();
+        init: function (options) {
+            if (!options) {
+                $.extend(this,core.getCurrentUrl());
+            } else {
+                $.extend(this,core.parseUrl(options.url));
+            }
+            this.loadParameters();
         },
 
-        load : function() {
+        loadParameters: function () {
             this.parameters = {};
-            var parameterString = window.location.search.substring(1);
+            var parameterString = this.search.substring(1);
             var parameters = parameterString.split("&");
-            for ( var i = 0; i < parameters.length; i++) {
+            for (var i = 0; i < parameters.length; i++) {
                 if (parameters[i].length === 0) {
                     continue;
                 }
@@ -169,22 +202,22 @@
                 var value = this.decode(pair[1]);
                 this.parameters[name] = value;
             }
-            this.modified=false;
+            this.modified = false;
         },
 
-        parameter : function(name, value) {
+        parameter: function (name, value) {
             if (arguments.length === 1) {
                 return this.parameters[name];
             } else {
-                if(value!==this.parameters[name]){
+                if (value !== this.parameters[name]) {
                     this.parameters[name] = value;
-                    this.modified=true;                    
+                    this.modified = true;
                 }
             }
             return this;
         },
 
-        parameterJSON : function(name, value) {
+        parameterJSON: function (name, value) {
             if (arguments.length === 1) {
                 var value2 = this.parameters[name];
                 if (typeof value2 === 'undefined') {
@@ -193,21 +226,21 @@
                 return JSON.parse(value2);
             } else {
                 var valueString = JSON.stringify(value);
-                if(valueString!==this.parameters[name]){
+                if (valueString !== this.parameters[name]) {
                     this.parameters[name] = valueString;
-                    this.modified=true;
-                }                 
+                    this.modified = true;
+                }
             }
             return this;
         },
 
-        submit : function() {
-            if(!this.modified){
+        submit: function () {
+            if (!this.modified) {
                 return;
             }
             var parameterString = "";
             var first = true;
-            for ( var parameterName in this.parameters) {
+            for (var parameterName in this.parameters) {
                 if (first) {
                     first = false;
                 } else {
@@ -220,14 +253,14 @@
             var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
             newUrl += "?" + parameterString;
             window.history.pushState("dummy", "Title", newUrl);
-            this.modified=false;
+            this.modified = false;
         },
 
-        encode : function(text) {
+        encode: function (text) {
             return encodeURIComponent(text);
         },
 
-        decode : function(text) {
+        decode: function (text) {
             return decodeURIComponent(text.replace(/\+/g, " "));
         }
 
@@ -236,12 +269,12 @@
     // =========================================================================
     // save selection
     // =========================================================================
-    core.saveSelection = function() {
+    core.saveSelection = function () {
         if (window.getSelection) {
             var sel = window.getSelection();
             if (sel.getRangeAt && sel.rangeCount) {
                 var ranges = [];
-                for ( var i = 0, len = sel.rangeCount; i < len; ++i) {
+                for (var i = 0, len = sel.rangeCount; i < len; ++i) {
                     ranges.push(sel.getRangeAt(i));
                 }
                 return ranges;
@@ -255,12 +288,12 @@
     // =========================================================================
     // restore selection
     // =========================================================================
-    core.restoreSelection = function(savedSel) {
+    core.restoreSelection = function (savedSel) {
         if (savedSel) {
             if (window.getSelection) {
                 var sel = window.getSelection();
                 sel.removeAllRanges();
-                for ( var i = 0, len = savedSel.length; i < len; ++i) {
+                for (var i = 0, len = savedSel.length; i < len; ++i) {
                     sel.addRange(savedSel[i]);
                 }
             } else if (document.selection && savedSel.select) {
@@ -272,14 +305,14 @@
     // =========================================================================
     // store cursor position
     // =========================================================================
-    core.getCaretPos = function(){
-        core.selRange= window.getSelection().getRangeAt(0);
+    core.getCaretPos = function () {
+        core.selRange = window.getSelection().getRangeAt(0);
     };
 
     // =========================================================================
     // restore cursor position
     // =========================================================================
-    core.restoreCaretPos = function(){
+    core.restoreCaretPos = function () {
         var selection = window.getSelection();
         if (selection.rangeCount > 0) {
             selection.removeAllRanges();
@@ -291,7 +324,7 @@
     // Simple JavaScript Templating
     // John Resig - http://ejohn.org/ - MIT Licensed
     // =========================================================================
-    (function() {
+    (function () {
         var cache = {};
 
         core.tmpl = function tmpl(str, data) {
@@ -301,16 +334,14 @@
 
             // Generate a reusable function that will serve as a template
             // generator (and which will be cached).
-            new Function("obj", "var p=[],print=function(){p.push.apply(p,arguments);};"
-                    +
+            new Function("obj", "var p=[],print=function(){p.push.apply(p,arguments);};" +
 
-                    // Introduce the data as local variables using with(){}
-                    "with(obj){p.push('"
-                    +
+                // Introduce the data as local variables using with(){}
+                "with(obj){p.push('" +
 
-                    // Convert the template into pure JavaScript
-                    str.replace(/[\r\t\n]/g, " ").split("<%").join("\t").replace(/((^|%>)[^\t]*)'/g, "$1\r").replace(/\t=(.*?)%>/g, "',$1,'").split("\t").join("');").split("%>")
-                            .join("p.push('").split("\r").join("\\'") + "');}return p.join('');");
+                // Convert the template into pure JavaScript
+                str.replace(/[\r\t\n]/g, " ").split("<%").join("\t").replace(/((^|%>)[^\t]*)'/g, "$1\r").replace(/\t=(.*?)%>/g, "',$1,'").split("\t").join("');").split("%>")
+                .join("p.push('").split("\r").join("\\'") + "');}return p.join('');");
 
             // Provide some basic currying to the user
             return data ? fn(data) : fn;
@@ -320,8 +351,9 @@
     // =========================================================================
     // select text of dom node
     // =========================================================================
-    core.selectText = function(node) {
-        var doc = document, range, selection;
+    core.selectText = function (node) {
+        var doc = document,
+            range, selection;
         if (doc.body.createTextRange) { // ms
             range = doc.body.createTextRange();
             range.moveToElementText(node);
@@ -338,17 +370,17 @@
     // =========================================================================
     // name/value dialog
     // =========================================================================
-    core.nameValueDialog = function(options, callback) {
+    core.nameValueDialog = function (options, callback) {
 
         var oldFields = $.extend(true, [], options.fields);
 
         // append title
-        var appendTitle = function(parentNode, field) {
+        var appendTitle = function (parentNode, field) {
             parentNode.append("<td colspan=2><span class='nvtitle'>" + field.title + "</span></td>");
         };
 
         // append input field
-        var appendInputField = function(parentNode, field) {
+        var appendInputField = function (parentNode, field) {
 
             var nameCell = $("<td></td>");
             parentNode.append(nameCell);
@@ -365,9 +397,9 @@
             var removeCell = $("<td></td>");
             parentNode.append(removeCell);
             var button = $("<button>Remove</button>");
-            button.click(function() {
+            button.click(function () {
                 parentNode.remove();
-                core.removeElements(options.fields, [ field ]);
+                core.removeElements(options.fields, [field]);
             });
             removeCell.append(button);
 
@@ -377,7 +409,7 @@
         var content = $("<div></div>");
         var table = $("<table style='margin-top:10px'></table>");
         content.append(table);
-        for ( var i = 0; i < options.fields.length; ++i) {
+        for (var i = 0; i < options.fields.length; ++i) {
             var field = options.fields[i];
             var row = $("<tr></tr>");
             table.append(row);
@@ -389,10 +421,10 @@
         }
         var addButton = $("<button>Add</button>");
         content.append(addButton);
-        addButton.click(function() {
+        addButton.click(function () {
             var field = {
-                name : 'new',
-                value : 'value'
+                name: 'new',
+                value: 'value'
             };
             options.fields.push(field);
             var row = $("<tr></tr>");
@@ -400,105 +432,107 @@
             appendInputField(row, field);
         });
 
-        var calculateDelta = function(oldFields,newFields){
+        var calculateDelta = function (oldFields, newFields) {
             var delta = {
-              addedFields : [],
-              deletedFields : [],
-              changedFields : []
+                addedFields: [],
+                deletedFields: [],
+                changedFields: []
             };
-            var oldMap = core.map(oldFields,function(field){
+            var oldMap = core.map(oldFields, function (field) {
                 return field.name;
             });
-            var newMap = core.map(newFields,function(field){
+            var newMap = core.map(newFields, function (field) {
                 return field.name;
             });
-            for(var i=0;i<newFields.length;++i){
+            for (var i = 0; i < newFields.length; ++i) {
                 var newField = newFields[i];
                 var oldField = oldMap[newField.name];
-                if(!oldField){
-                    delta.addedFields.push({ name  : newField.name,
-                                             value : newField.value});                    
-                }else{
-                    if(oldField.value!==newField.value){
+                if (!oldField) {
+                    delta.addedFields.push({
+                        name: newField.name,
+                        value: newField.value
+                    });
+                } else {
+                    if (oldField.value !== newField.value) {
                         delta.changedFields.push({
-                            name     : newField.name,                          
-                            oldValue : oldField.value,
-                            newValue : newField.value
+                            name: newField.name,
+                            oldValue: oldField.value,
+                            newValue: newField.value
                         });
                     }
-                }                
+                }
             }
-            for(var i=0;i<oldFields.length;++i){
+            for (var i = 0; i < oldFields.length; ++i) {
                 var oldField = oldFields[i];
                 var newField = newMap[oldField.name];
-                if(!newField){
+                if (!newField) {
                     delta.deletedFields.push({
-                        name : oldField.name,
+                        name: oldField.name,
                         value: oldField.value
                     });
                 }
             }
             return delta;
         };
-        
+
         // dialog widget
         content.dialog({
-            buttons : [ {
-                text : "Ok",
-                click : function() {
+            buttons: [{
+                text: "Ok",
+                click: function () {
                     // transfer values from input fields to object
-                    for ( var i = 0; i < options.fields.length; ++i) {
+                    for (var i = 0; i < options.fields.length; ++i) {
                         var field = options.fields[i];
                         field.name = field.nameInputField.val();
                         field.value = field.valueInputField.val();
                     }
                     // delta
-                    this.delta = calculateDelta(oldFields, options.fields);        
+                    this.delta = calculateDelta(oldFields, options.fields);
                     // close dialog
-                    $(this).dialog("close");                    
+                    $(this).dialog("close");
                 }
-            } ],
-            close: function(){
-              callback(this.delta);  
+            }],
+            close: function () {
+                callback(this.delta);
             },
-            title : options.title,
-            width : 600
+            title: options.title,
+            width: 600
         });
     };
 
     // =========================================================================
     // endsWith
     // =========================================================================
-    core.endsWith = function(str, suffix) {
+    core.endsWith = function (str, suffix) {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
     };
 
     // =========================================================================
     // startsWith
     // =========================================================================
-    core.startsWith = function(str, prefix) {
+    core.startsWith = function (str, prefix) {
         return str.indexOf(prefix) === 0;
     };
 
     // =========================================================================
     // load stylesheet
     // =========================================================================
-    core.loadStyleSheet = function(name){
-        
+    core.loadStyleSheet = function (name) {
+
         var rel = "stylesheet";
-        if(core.endsWith(name, ".less")){
+        if (core.endsWith(name, ".less")) {
             rel = "stylesheet/less";
         }
-        
+
         var link = $("<link>");
         link.attr({
-                type : 'text/css',
-                rel  : rel,
-                href : name
+            type: 'text/css',
+            rel: rel,
+            href: name
         });
-        $("head").append( link );
-        
-        if(core.endsWith(name, ".less")){
+        $("head").append(link);
+
+        if (core.endsWith(name, ".less")) {
             less.sheets.push(link.get(0));
             less.refresh();
         }

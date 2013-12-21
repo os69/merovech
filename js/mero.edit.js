@@ -1,4 +1,4 @@
-(function(global) {
+(function (global) {
     "use strict";
 
     /* global window */
@@ -23,12 +23,15 @@
         // ---------------------------------------------------------------------
         // init
         // ---------------------------------------------------------------------
-        init : function(parent) {
+        init: function (parent) {
 
             // create main container
             var self = this;
             this.containerDiv = $(parent);
 
+            // outline style
+            self.outlineFocus = "1px dashed red";
+            
             // create navbar
             this.navbarDiv = $("<div class='navbar navbar-fixed-top'></div>");
             this.containerDiv.append(this.navbarDiv);
@@ -45,14 +48,14 @@
             // create command input field
             this.commandInput = $("<input class='span2' type='text' style='margin-right:10px;width:100px;'></input>");
             this.inputForm.append(this.commandInput);
-            this.commandInput.keydown(function(event) {
+            this.commandInput.keydown(function (event) {
                 self.handleCommandInputKey(event);
             });
 
             // autocomplete for command input field
             this.autocompleteList = [];
             this.commandInput.autocomplete({
-                source : function() {
+                source: function () {
                     self.autocomplete.apply(self, arguments);
                 }
             });
@@ -60,7 +63,7 @@
             // create css status field
             this.cssInput = $("<input class='span2' type='text' style='width:50px;'></input>");
             this.inputForm.append(this.cssInput);
-            this.cssInput.keydown(function(event) {
+            this.cssInput.keydown(function (event) {
                 self.handleCssInputKey(event);
             });
 
@@ -74,50 +77,58 @@
             // create content
             this.contentDiv = $("<div tabindex=1 class='jse-content container'></div>");
             this.containerDiv.append(this.contentDiv);
-            this.contentDiv.append($("<h1 tabindex=1 contenteditable='true'>Heading1</h1>"));            
+            this.createDefaultContent();
 
             // assign event handlers for all elements in content
             this.relevantElements = commands.relevantElements;
             this.assignHandlers(this.contentDiv);
 
-            // load page
+            // command stack
+            self.commandStack = [];
+
+            // check for custom css stylesheet
+            var css = core.url().parameter("css");
+            if (css) {
+                core.loadStyleSheet(css);
+            }
+
+            // check for custom less stylesheet
+            var less = core.url().parameter("less");
+            if (less) {
+                core.loadStyleSheet(less);
+            }
+
+            // load page           
             var pageName = core.url().parameter("page");
             if (pageName) {
                 self.loadPage(pageName);
-            }else{
+            } else {
                 this.setElement(this.contentDiv.find("h1"));
-            }
-
-            // command stack
-            self.commandStack = [];
-            
-            // check for custom css stylesheet
-            var css = core.url().parameter("css");
-            if(css){
-                core.loadStyleSheet(css);
-            }
-            
-            // check for custom less stylesheet
-            var less = core.url().parameter("less");
-            if(less){
-                core.loadStyleSheet(less);
             }
 
         },
 
         // ---------------------------------------------------------------------
+        // create default content
+        // ---------------------------------------------------------------------
+        createDefaultContent: function () {
+            this.contentDiv.empty();
+            this.contentDiv.append($("<h1 tabindex=1 contenteditable='true'>Heading1</h1>"));
+        },
+
+        // ---------------------------------------------------------------------
         // key events command input
         // ---------------------------------------------------------------------
-        handleCommandInputKey : function(event) {
+        handleCommandInputKey: function (event) {
             var self = this;
             switch (event.keyCode) {
             case 13:
                 event.preventDefault();
                 // async needed if command is choosen from history (don't know why)
-                setTimeout(function(){
-                    self.executeCommandLine();    
+                setTimeout(function () {
+                    self.executeCommandLine();
                     self.element.focus();
-                },0);                
+                }, 0);
                 break;
             case 27:
                 self.element.focus();
@@ -128,7 +139,7 @@
         // ---------------------------------------------------------------------
         // key events css status field
         // ---------------------------------------------------------------------
-        handleCssInputKey : function(event) {
+        handleCssInputKey: function (event) {
             var self = this;
             switch (event.keyCode) {
             case 13:
@@ -146,13 +157,13 @@
         // ---------------------------------------------------------------------
         // create buttons
         // ---------------------------------------------------------------------
-        createButtons : function(toolbar) {
+        createButtons: function (toolbar) {
             var self = this;
             // var container = $("<div class='btn-toolbar'></div>");
             // toolbar.append(container);
             var container = toolbar;
             var groups = {};
-            $.each(commands, function(key, commandClass) {
+            $.each(commands, function (key, commandClass) {
                 if (!commandClass.prototype || !commandClass.prototype.button || !commandClass.prototype.buttonGroup) {
                     return;
                 }
@@ -164,13 +175,13 @@
                     container.append(group);
                 }
                 var button = $("<button class='btn'>" + prot.button + "</button>");
-                if(commandClass.prototype.charLabel){
-                    button.attr("title",commandClass.prototype.charLabel);
-                }else if(commandClass.prototype.char){
-                    button.attr("title","ALT+"+commandClass.prototype.char.toUpperCase());
+                if (commandClass.prototype.charLabel) {
+                    button.attr("title", commandClass.prototype.charLabel);
+                } else if (commandClass.prototype.char) {
+                    button.attr("title", "ALT+" + commandClass.prototype.char.toUpperCase());
                 }
                 group.append(button);
-                button.click(function() {
+                button.click(function () {
                     if (prot.buttonTemplate) {
                         self.executeCommandLineInit();
                         self.commandInput.val(prot.buttonTemplate);
@@ -186,20 +197,20 @@
         // ---------------------------------------------------------------------
         // create command context
         // ---------------------------------------------------------------------
-        createContext : function(obj) {
+        createContext: function (obj) {
             return $.extend({
-                element : this.element,
-                copyElement : this.copyElement,
-                editor : this
-            },obj);
+                element: this.element,
+                copyElement: this.copyElement,
+                editor: this
+            }, obj);
         },
 
         // ---------------------------------------------------------------------
         // autocomplete
         // ---------------------------------------------------------------------
-        autocomplete : function(input, cb) {
+        autocomplete: function (input, cb) {
             var list = [];
-            for ( var i = 0; i < this.autocompleteList.length; ++i) {
+            for (var i = 0; i < this.autocompleteList.length; ++i) {
                 var term = this.autocompleteList[i];
                 if (term.indexOf(input.term) === 0) {
                     list.push(term);
@@ -211,7 +222,7 @@
         // ---------------------------------------------------------------------
         // get character code from event
         // ---------------------------------------------------------------------
-        getCharCode : function(event){
+        getCharCode: function (event) {
             var key;
             if (event.keyCode !== 0) {
                 key = event.keyCode;
@@ -225,45 +236,45 @@
         // ---------------------------------------------------------------------
         // handle paste event
         // ---------------------------------------------------------------------
-        handlePaste : function(event){
+        handlePaste: function (event) {
             var self = this;
             event.stopPropagation();
-            core.getCaretPos();            
+            core.getCaretPos();
             this.commandInput.val("");
-            this.commandInput.focus();            
-            setTimeout(function(){
+            this.commandInput.focus();
+            setTimeout(function () {
                 self.element.focus();
                 core.restoreCaretPos();
                 document.execCommand("insertText", false, self.commandInput.val());
                 self.commandInput.val("");
-            },0);            
+            }, 0);
         },
-        
+
         // ---------------------------------------------------------------------
         // handle key events of html elements
         // ---------------------------------------------------------------------
-        handle : function(element, event) {
+        handle: function (element, event) {
 
             var self = this;
             //self.element = $(element);
-            var command;            
+            var command;
             var key = null;
-            
-            if(event.ctrlKey && event.keyCode !== 17){
-                
+
+            if (event.ctrlKey && event.keyCode !== 17) {
+
                 //. 1 CTRL KEY
                 // -------------------------------------------------------------
 
                 key = self.getCharCode(event);
-                if(key===118){
+                if (key === 118) {
                     self.handlePaste(event);
                 }
-                
+
             } else if (event.altKey && event.keyCode !== 18) {
-                
+
                 // 2. ALT KEY
                 // -------------------------------------------------------------                
-                
+
                 // get command by key
                 key = self.getCharCode(event);
                 var commandClass = commands.commandByKey[key];
@@ -283,7 +294,7 @@
                 return;
 
             } else {
-                
+
                 // 3. OTHERS
                 // -------------------------------------------------------------
                 switch (event.keyCode) {
@@ -294,6 +305,10 @@
                     event.preventDefault();
                     this.executeCommandLineInit();
                     break;
+                case 9:                    
+                    event.stopPropagation();
+                    event.preventDefault();
+                    break;
                 }
             }
 
@@ -302,68 +317,76 @@
         // ---------------------------------------------------------------------
         // execute command
         // ---------------------------------------------------------------------
-        executeCommand : function(command,pushOnStack) {
-            
+        executeCommand: function (command, pushOnStack) {
+
             // execute command
-            try{
-                if(command.setParameters){
-                    command.setParameters();    
-                }                
-                command.execute();    
-            }catch(e){
+            try {
+                if (command.setParameters) {
+                    command.setParameters();
+                }
+                command.execute();
+            } catch (e) {
                 alert(e);
                 return;
             }
-                        
+
             // if undo is immpossible -> return
-            if(command.undo===commands.Command.prototype.undo){
+            if (command.undo === commands.Command.prototype.undo) {
                 return;
             }
-            
+
             // check whether command shall be pushed
-            if(arguments.length>=2 && !pushOnStack){
+            if (arguments.length >= 2 && !pushOnStack) {
                 return;
             }
-            
+
             // put command on command stack (for undo)
             this.commandStack.push(command);
-            
+
         },
 
         // ---------------------------------------------------------------------
         // set current focus element
         // ---------------------------------------------------------------------
-        setElement : function(element) {
+        setElement: function (element) {
             var self = this;
 
             if (element && element.length > 0) {
+                if(self.element){
+                    self.element.css("outline","0");
+                }
                 self.element = element;
                 var path = self.getPath();
                 self.statusSpan.text(path);
-                self.statusSpan.attr("title",path);
+                self.statusSpan.attr("title", path);
                 self.cssInput.val(self.getCss());
             }
 
             if (self.element.length > 0) {
                 self.element.focus();
+                self.element.css("outline",self.outlineFocus);
                 if (self.element.get(0).tagName === 'IMG') {
-                    self.element.one('load', function() {
+                    self.element.one('load', function () {
                         self.element.focus();
+                        self.element.css("outline",self.outlineFocus);
                     });
                 }
                 if (self.element.attr("contenteditable") === "true") {
-                    if(self.element.text()===""){
+                    if (self.element.text() === "") {
                         self.element.text(self.element.get(0).tagName.toLowerCase());
                         core.selectText(self.element.get(0));
-                        self.element.focus();                        
+                        self.element.focus();
+                        self.element.css("outline",self.outlineFocus);
                     }
-                }else{
-                    if(self.element.get(0).tagName === 'SPAN' || self.element.text()===""){
+                } else {
+                    //if(self.element.get(0).tagName === 'SPAN' || self.element.text()===""){
+                    if (self.element.children().length === 0) {
                         var editableElement = $(commands.editableElement);
                         editableElement.text("span");
                         self.element.append(editableElement);
                         self.assignHandlers(self.element);
                         self.element.focus();
+                        self.element.css("outline",self.outlineFocus);
                     }
                 }
             }
@@ -373,14 +396,14 @@
         // ---------------------------------------------------------------------
         // get css classes of focus element
         // ---------------------------------------------------------------------
-        getCss : function() {
+        getCss: function () {
             return this.element.attr("class");
         },
 
         // ---------------------------------------------------------------------
         // get dom path of focus element
         // ---------------------------------------------------------------------
-        getPath : function() {
+        getPath: function () {
             var path = [];
             var element = this.element;
             var hasParent = true;
@@ -402,7 +425,7 @@
         // ---------------------------------------------------------------------
         // execute command line init
         // ---------------------------------------------------------------------
-        executeCommandLineInit : function() {
+        executeCommandLineInit: function () {
             var self = this;
             self.commandInput.focus();
             self.commandInput.val("");
@@ -411,7 +434,7 @@
         // ---------------------------------------------------------------------
         // execute command line
         // ---------------------------------------------------------------------
-        executeCommandLine : function() {
+        executeCommandLine: function () {
 
             // split command line into parts
             var self = this;
@@ -434,7 +457,9 @@
             var parameters = parts.slice(1);
 
             // create command
-            var command = new commandClass(self.createContext({parameters:parameters}));
+            var command = new commandClass(self.createContext({
+                parameters: parameters
+            }));
 
             // update history
             if (this.autocompleteList.indexOf(commandLine) === -1) {
@@ -453,7 +478,7 @@
         // --------------------------------------------------------------------
         // load page
         // ---------------------------------------------------------------------
-        loadPage : function(pageName) {
+        loadPage: function (pageName) {
             var self = this;
             if (!pageName) {
                 pageName = core.url().parameter("page");
@@ -462,41 +487,51 @@
                 }
             }
             $.ajax({
-                url : pageName + ".html",
-                success : function(data) {
+                url: pageName + ".html",
+                success: function (data) {
+
                     
                     // clear old content
                     self.contentDiv.empty();
                     
+
                     // append new content
                     self.contentDiv.append($(data));
                     self.assignHandlers(self.contentDiv);
-                    
+
                     // set focus to first contenteditable
-                    var focusElement = $(".jse-content").find('[contenteditable="true"]');
-                    focusElement = $(focusElement.get(0));
-                    if(focusElement.length>0){
-                        self.setElement(focusElement);
-                    }
-                    
+                    setTimeout(function () {
+                        var focusElement = $(".jse-content").find('[contenteditable="true"]');
+                        focusElement = $(focusElement.get(0));
+                        if (focusElement.length > 0) {
+                            self.setElement(focusElement);
+                        }
+                    }, 10);
+
+                    /*  setTimeout(function(){
+                        jQuery.event.trigger({ type : 'keypress', which : 9 });
+                    },2000);*/
+
+
                     // adjust url
                     core.url().parameter("page", pageName).submit();
-                    
+
                 },
-                dataType : 'text'
-            }).error(function() {
-                alert("Cannot load page '"+pageName+"' error:" + arguments[0].statusText);
-            }).success(function() {
+                dataType: 'text'
+            }).error(function () {
+                alert("Cannot load page '" + pageName + "' error:" + arguments[0].statusText);
+            }).success(function () {
+                self.commandStack = [];
                 // alert("ok");
             });
-            
-            
+
+
         },
 
         // --------------------------------------------------------------------
         // save page
         // ---------------------------------------------------------------------
-        savePage : function(pageName) {
+        savePage: function (pageName) {
             var content = this.contentDiv.html();
             if (!pageName) {
                 pageName = core.url().parameter("page");
@@ -505,16 +540,16 @@
                 }
             }
             $.ajax({
-                type : 'POST',
-                url : pageName + ".html",
-                data : content,
-                processData : false,
-                dataType : 'text'
-            }).error(function() {
+                type: 'POST',
+                url: pageName + ".html",
+                data: content,
+                processData: false,
+                dataType: 'text'
+            }).error(function () {
                 alert("error:" + arguments[0].statusText);
-            }).success(function() {
+            }).success(function () {
                 core.url().parameter("page", pageName).submit();
-                alert("ok");
+                alert("Page '" + pageName + "' saved.");
             });
 
         },
@@ -522,7 +557,7 @@
         // --------------------------------------------------------------------
         // assignHandlers
         // ---------------------------------------------------------------------
-        assignHandlers : function(node) {
+        assignHandlers: function (node) {
             // node itself
             var filtered = node.filter(this.relevantElements);
             this.assignByElements(filtered);
@@ -533,14 +568,14 @@
         // --------------------------------------------------------------------
         // assign by elements
         // ---------------------------------------------------------------------
-        assignByElements : function(elements) {
+        assignByElements: function (elements) {
             var self = this;
             elements.off("keydown"); // keypress
-            elements.keydown(function(event) { // keypress
+            elements.keydown(function (event) { // keypress
                 self.handle(this, event);
             });
             elements.off("click");
-            elements.click(function(event) {
+            elements.click(function (event) {
                 if ($(this).hasClass("jse-content")) {
                     return;
                 }
@@ -548,61 +583,57 @@
                 event.stopPropagation();
             });
             elements.filter("a").off("dblclick");
-            elements.filter("a").dblclick(function() {
+            elements.filter("a").dblclick(function () {
                 var link = $(this).attr("href");
-                window.location = link;
+                self.navigate(link);
             });
             elements.filter("a").off("click");
-            elements.filter("a").click(function() {
+            elements.filter("a").click(function () {
                 var link = $(this).attr("href");
-                window.location = link;
+                self.navigate(link);
             });
-            
-//            elements.off('paste');
-//            elements.on('paste', function (event) {
-//                event.stopPropagation();
-//                var element = $(this);
-//                setTimeout(function () {
-//                  if(element.get(0).tagName==='SPAN'){
-//                      var parent = element.parent();
-//                      var children = parent.children();
-//                      var text=parent.text();
-//                      parent.empty();
-//                      parent.append($("<span>"+text+"</span>"));
-//                  }else{
-//                      var text = $(element).text();
-//                      $(element).html(text);                      
-//                  }
-//                }, 1000);
-//              });
+        },
 
+        // ---------------------------------------------------------------------
+        // navigation
+        // ---------------------------------------------------------------------
+        navigate: function (url) {
+            var url = core.url({
+                url: url
+            });
+            if (core.endsWith(url.pathname, "mero.html")) {
+                var targetPage = url.parameter("page");
+                this.loadPage(targetPage);
+            } else {
+                window.location = url;
+            }
         },
 
         // ---------------------------------------------------------------------
         // make static
         // ---------------------------------------------------------------------
-        makeStatic : function() {
+        makeStatic: function () {
             this.content.find("*").attr("contenteditable", false);
         },
 
         // ---------------------------------------------------------------------
         // save selection
         // ---------------------------------------------------------------------
-        saveSelection : function() {
+        saveSelection: function () {
             this.selection = core.saveSelection();
         },
 
         // ---------------------------------------------------------------------
         // restore selection
         // ---------------------------------------------------------------------
-        restoreSelection : function() {
+        restoreSelection: function () {
             core.restoreSelection(this.selection);
         },
 
         // ---------------------------------------------------------------------
         // find sibling
         // ---------------------------------------------------------------------
-        findSibling : function(element, type) {
+        findSibling: function (element, type) {
             if (element.is(type)) {
                 return element;
             }

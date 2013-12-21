@@ -79,6 +79,9 @@
         <li>
             <a href="#save">save</a>
         </li>
+        <li>
+            <a href="#new">new</a>
+        </li>
     </ul>
     <p>
         <a href="#General">General Commands</a>
@@ -283,6 +286,7 @@ you can see some nested divs. Click on a div. Now you can navigate by
         </tr>
     </tbody>
 </table>
+In the top status bar you can see DOM path of the current element.
 
 <a name="Executing Commands"></a>
 <h2>Executing Commands</h2>
@@ -365,7 +369,6 @@ supports the following URL parameters:
 
 <h2>Extend and Customize Commands</h2>
 You can customize the command or add own commands by editing mero.commands.js.
-
 
 <div id="commandreference">
     <a name="Navigation"></a>
@@ -592,6 +595,31 @@ You can customize the command or add own commands by editing mero.commands.js.
             <b></b>
         </b>
         <p>Save page.</p>
+        <b class="section">Parameters:</b>
+        <p>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <i>pagename</i>
+                        </td>
+                        <td>Name of page.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </p>
+    </div>
+    <div class="command-container">
+        <a name="new"></a>
+        <h2>Command new</h2>
+        <b class="section">Synopsis:</b>
+        <p>new
+            <i>pagename</i>
+        </p>
+        <b class="section">Description:
+            <b></b>
+        </b>
+        <p>Create new page.</p>
         <b class="section">Parameters:</b>
         <p>
             <table>
