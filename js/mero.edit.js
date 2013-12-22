@@ -77,11 +77,9 @@
             // create content
             this.contentDiv = $("<div tabindex=1 class='jse-content container'></div>");
             this.containerDiv.append(this.contentDiv);
-            this.createDefaultContent();
 
             // assign event handlers for all elements in content
             this.relevantElements = commands.relevantElements;
-            this.assignHandlers(this.contentDiv);
 
             // command stack
             self.commandStack = [];
@@ -103,7 +101,7 @@
             if (pageName) {
                 self.loadPage(pageName);
             } else {
-                this.setElement(this.contentDiv.find("h1"));
+                this.createDefaultContent();
             }
 
         },
@@ -114,6 +112,8 @@
         createDefaultContent: function () {
             this.contentDiv.empty();
             this.contentDiv.append($("<h1 tabindex=1 contenteditable='true'>Heading1</h1>"));
+            this.assignHandlers(this.contentDiv);
+            this.setElement(this.contentDiv.find("h1"));
         },
 
         // ---------------------------------------------------------------------
@@ -493,7 +493,6 @@
                     
                     // clear old content
                     self.contentDiv.empty();
-                    
 
                     // append new content
                     self.contentDiv.append($(data));
@@ -532,13 +531,23 @@
         // save page
         // ---------------------------------------------------------------------
         savePage: function (pageName) {
+            
+            var self = this;
+            
+            // get content
+            self.element.css("outline","0");
             var content = this.contentDiv.html();
+            self.element.css("outline",self.outlineFocus);
+            
+            // set pagename
             if (!pageName) {
                 pageName = core.url().parameter("page");
                 if (!pageName) {
                     pageName = "default";
                 }
             }
+            
+            // save
             $.ajax({
                 type: 'POST',
                 url: pageName + ".html",
@@ -549,7 +558,8 @@
                 alert("error:" + arguments[0].statusText);
             }).success(function () {
                 core.url().parameter("page", pageName).submit();
-                alert("Page '" + pageName + "' saved.");
+                self.element.css("outline",self.outlineFocus);
+                alert("Page '"+pageName+"' saved.");
             });
 
         },
