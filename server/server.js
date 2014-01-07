@@ -36,7 +36,8 @@ var serveFile = function(response, filename, prefixes, prefixIndex) {
 			return;
 		}
 
-		console.log("ok");
+        
+        console.log("-->"+filepath,prefixes[prefixIndex],filename);
 		response.writeHead(200, {
 			'Content-Type' : getMimeType(filepath)
 		});

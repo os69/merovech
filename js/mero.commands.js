@@ -606,7 +606,7 @@
         setParameters: function () {
             if (this.parameters.length >= 1) {
                 this.pageName = this.parameters[0];
-            }else{
+            } else {
                 alert("Pagename missing!");
             }
         },
@@ -879,6 +879,59 @@
         template: '<td tabindex=1><%=editableElement%></td>'
     });
 
+    // =========================================================================
+    // thumbnails
+    // =========================================================================
+    module.ThumbnailCommand = core.createDerivedClass(module.InsertBaseCommand, {
+        name: 'thumbnails',
+        doc: 'Create thumbnails.',
+        group: 'Tools',
+        setParameters: function () {
+            module.InsertBaseCommand.prototype.setParameters.apply(this, arguments);
+            if (this.parameters.length < 1) {
+                throw "Missing parameter url";
+            }
+            this.url = this.parameters[0];
+        },
+        pad: function (text, length) {
+            return "0000000000".slice(0, length - text.length) + text;
+        },
+        execute: function () {
+
+            var self = this;
+
+            // create element and insert
+            this.insertElement = $("<div tabindex=1></div>");
+            this.insert();
+
+            // check for images
+            var prefix = this.url.split("_")[0];
+            var pics = [];
+            var defs = [];
+            for (var i = 0; i <= 20; ++i) {
+                (function () {
+                    var d = $.Deferred();
+                    defs.push(d.promise());
+                    var name = prefix + "_" + self.pad("" + i, 3) + ".jpg";
+                    $.get(name).done(function () {
+                        pics.push(name);
+                    }).always(function () {
+                        d.resolve();
+                    });
+                })();
+            }
+
+            // execute when image check is finished
+            $.when.apply(null, defs).then(function () {
+                for (var i = 0; i < pics.length; ++i) {
+                    var pic =pics[i];
+                    self.insertElement.append("<img src=\"" + pic + "\" class=\"ib is2\">");
+                }
+                self.editor.assignHandlers(self.insertElement);
+                self.editor.setElement(self.insertElement);
+            });
+        }
+    });
 
     // =========================================================================
     // create map: command by key

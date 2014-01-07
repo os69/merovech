@@ -182,9 +182,9 @@
 
         init: function (options) {
             if (!options) {
-                $.extend(this,core.getCurrentUrl());
+                $.extend(this, core.getCurrentUrl());
             } else {
-                $.extend(this,core.parseUrl(options.url));
+                $.extend(this, core.parseUrl(options.url));
             }
             this.loadParameters();
         },
