@@ -31,7 +31,7 @@
 
             // outline style
             self.outlineFocus = "1px dashed red";
-            
+
             // create navbar
             this.navbarDiv = $("<div class='navbar navbar-fixed-top'></div>");
             this.containerDiv.append(this.navbarDiv);
@@ -305,7 +305,7 @@
                     event.preventDefault();
                     this.executeCommandLineInit();
                     break;
-                case 9:                    
+                case 9:
                     event.stopPropagation();
                     event.preventDefault();
                     break;
@@ -346,14 +346,35 @@
         },
 
         // ---------------------------------------------------------------------
+        // check for parent element with contenteditable = true
+        // ---------------------------------------------------------------------
+        checkForParentContentEditable: function (element) {
+
+            if (!element || element.length === 0) return element;
+
+            var parent = element;
+            while (true) {
+                parent = parent.parent();
+                if (parent.length === 0) {
+                    return element;
+                }
+                if (parent.attr('contenteditable') === 'true') {
+                    return parent;
+                }
+            }
+        },
+
+        // ---------------------------------------------------------------------
         // set current focus element
         // ---------------------------------------------------------------------
         setElement: function (element) {
             var self = this;
 
+            element = self.checkForParentContentEditable(element);
+
             if (element && element.length > 0) {
-                if(self.element){
-                    self.element.css("outline","0");
+                if (self.element) {
+                    self.element.css("outline", "0");
                 }
                 self.element = element;
                 var path = self.getPath();
@@ -364,11 +385,11 @@
 
             if (self.element.length > 0) {
                 self.element.focus();
-                self.element.css("outline",self.outlineFocus);
+                self.element.css("outline", self.outlineFocus);
                 if (self.element.get(0).tagName === 'IMG') {
                     self.element.one('load', function () {
                         self.element.focus();
-                        self.element.css("outline",self.outlineFocus);
+                        self.element.css("outline", self.outlineFocus);
                     });
                 }
                 if (self.element.attr("contenteditable") === "true") {
@@ -376,7 +397,7 @@
                         self.element.text(self.element.get(0).tagName.toLowerCase());
                         core.selectText(self.element.get(0));
                         self.element.focus();
-                        self.element.css("outline",self.outlineFocus);
+                        self.element.css("outline", self.outlineFocus);
                     }
                 } else {
                     //if(self.element.get(0).tagName === 'SPAN' || self.element.text()===""){
@@ -386,7 +407,7 @@
                         self.element.append(editableElement);
                         self.assignHandlers(self.element);
                         self.element.focus();
-                        self.element.css("outline",self.outlineFocus);
+                        self.element.css("outline", self.outlineFocus);
                     }
                 }
             }
@@ -490,7 +511,7 @@
                 url: pageName + ".html",
                 success: function (data) {
 
-                    
+
                     // clear old content
                     self.contentDiv.empty();
 
@@ -531,14 +552,14 @@
         // save page
         // ---------------------------------------------------------------------
         savePage: function (pageName) {
-            
+
             var self = this;
-            
+
             // get content
-            self.element.css("outline","0");
+            self.element.css("outline", "0");
             var content = this.contentDiv.html();
-            self.element.css("outline",self.outlineFocus);
-            
+            self.element.css("outline", self.outlineFocus);
+
             // set pagename
             if (!pageName) {
                 pageName = core.url().parameter("page");
@@ -546,7 +567,7 @@
                     pageName = "default";
                 }
             }
-            
+
             // save
             $.ajax({
                 type: 'POST',
@@ -558,8 +579,8 @@
                 alert("error:" + arguments[0].statusText);
             }).success(function () {
                 core.url().parameter("page", pageName).submit();
-                self.element.css("outline",self.outlineFocus);
-                alert("Page '"+pageName+"' saved.");
+                self.element.css("outline", self.outlineFocus);
+                alert("Page '" + pageName + "' saved.");
             });
 
         },
