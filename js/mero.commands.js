@@ -285,11 +285,10 @@
         execute: function () {
             var newElement = this.element.prev();
             if (newElement.length === 0) {
-                return;
-                //newElement = this.element.parent().children().slice(-1);
-                //if (newElement.length === 0) {
-                //    return;
-                //}
+                newElement = this.element.parent();
+                if (newElement.hasClass('jse-content')) {
+                    return;
+                }
             }
             this.editor.setElement(newElement);
         }
@@ -305,15 +304,14 @@
         doc: 'Move focus to next dom element.',
         group: 'Navigation',
         execute: function () {
-            var newElement = this.element.next();
-            if (newElement.length === 0) {
-                return;
-                //newElement = this.element.parent().children().slice(0, 1);
-                //if (newElement.length === 0) {
-                //    return;
-                //}
+            var newElement = this.element;
+            while (newElement.next().length === 0) {
+                newElement = newElement.parent();
+                if (newElement.length === 0 || newElement.hasClass('jse-content')) {
+                    return;
+                }
             }
-            this.editor.setElement(newElement);
+            this.editor.setElement(newElement.next());
         }
     });
 
@@ -417,11 +415,12 @@
         group: 'Tools',
 
         execute: function () {
+            var command;
 
             // search for first cut command
             var found = false;
             for (var i = this.editor.commandStack.length - 1; i >= 0; i--) {
-                var command = this.editor.commandStack[i];
+                command = this.editor.commandStack[i];
                 if (command.name !== module.CutCommand.prototype.name) {
                     continue;
                 }
@@ -437,7 +436,7 @@
             this.commands = [];
             var first = true;
             for (; i >= 0; i--) {
-                var command = this.editor.commandStack[i];
+                command = this.editor.commandStack[i];
                 if (command.name !== module.CutCommand.prototype.name) {
                     break;
                 }
@@ -520,20 +519,21 @@
                 fields: fields,
                 title: 'Attributes'
             }, function (delta) {
+                var i, field;
                 if (!delta) {
                     self.editor.setElement(self.editor.element);
                     return;
                 }
-                for (var i = 0; i < delta.addedFields.length; ++i) {
-                    var field = delta.addedFields[i];
+                for (i = 0; i < delta.addedFields.length; ++i) {
+                    field = delta.addedFields[i];
                     self.element.attr(field.name, field.value);
                 }
-                for (var i = 0; i < delta.deletedFields.length; ++i) {
-                    var field = delta.deletedFields[i];
+                for (i = 0; i < delta.deletedFields.length; ++i) {
+                    field = delta.deletedFields[i];
                     self.element.removeAttr(field.name);
                 }
-                for (var i = 0; i < delta.changedFields.length; ++i) {
-                    var field = delta.changedFields[i];
+                for (i = 0; i < delta.changedFields.length; ++i) {
+                    field = delta.changedFields[i];
                     self.element.attr(field.name, field.newValue);
                 }
                 self.editor.setElement(self.editor.element);
@@ -909,7 +909,7 @@
             var pics = [];
             var defs = [];
             for (var i = 0; i <= 20; ++i) {
-                (function () {
+                (function () { /* jshint ignore:line */
                     var d = $.Deferred();
                     defs.push(d.promise());
                     var name = prefix + "_" + self.pad("" + i, 3) + ".jpg";
@@ -918,13 +918,13 @@
                     }).always(function () {
                         d.resolve();
                     });
-                })();
+                })(); /* jshint ignore:line */
             }
 
             // execute when image check is finished
             $.when.apply(null, defs).then(function () {
                 for (var i = 0; i < pics.length; ++i) {
-                    var pic =pics[i];
+                    var pic = pics[i];
                     self.insertElement.append("<img src=\"" + pic + "\" class=\"ib is2\">");
                 }
                 self.editor.assignHandlers(self.insertElement);
@@ -947,14 +947,14 @@
             }
             if (command.prototype.charCode) {
                 if (module.commandByKey[command.prototype.charCode]) {
-                    alert("duplicate key " + charCode);
+                    alert("duplicate key " + command.prototype.charCode);
                 }
                 module.commandByKey[command.prototype.charCode] = command;
                 continue;
             }
             if (command.prototype.char) {
                 if (module.commandByKey[command.prototype.char.charCodeAt(0)]) {
-                    alert("duplicate key " + char);
+                    alert("duplicate key " + command.prototype.char);
                 }
                 module.commandByKey[command.prototype.char.charCodeAt(0)] = command;
                 continue;

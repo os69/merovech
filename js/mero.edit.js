@@ -6,6 +6,7 @@
     /* global alert */
     /* global $ */
     /* global location */
+    /* global setTimeout */
 
     // =========================================================================
     // packages
@@ -73,6 +74,11 @@
 
             // toolbar buttons
             this.createButtons(this.toolbarDiv);
+
+            // invisible text input for capturing clipboard content
+            this.clipboardTextArea = $("<textarea></textarea>");
+            this.clipboardTextArea.css("display", "none");
+            this.containerDiv.append(this.clipboardTextArea);
 
             // create content
             this.contentDiv = $("<div tabindex=1 class='jse-content container'></div>");
@@ -159,8 +165,6 @@
         // ---------------------------------------------------------------------
         createButtons: function (toolbar) {
             var self = this;
-            // var container = $("<div class='btn-toolbar'></div>");
-            // toolbar.append(container);
             var container = toolbar;
             var groups = {};
             $.each(commands, function (key, commandClass) {
@@ -186,7 +190,7 @@
                         self.executeCommandLineInit();
                         self.commandInput.val(prot.buttonTemplate);
                     } else {
-                        var command = new commandClass(self.createContext());
+                        var command = new commandClass(self.createContext()); /* jshint ignore:line */
                         self.executeCommand(command);
                     }
                 });
@@ -240,13 +244,17 @@
             var self = this;
             event.stopPropagation();
             core.getCaretPos();
-            this.commandInput.val("");
-            this.commandInput.focus();
+            this.clipboardTextArea.css("display", "block");
+            this.clipboardTextArea.val("");
+            this.clipboardTextArea.focus();
+            //this.commandInput.val("");
+            //this.commandInput.focus();
             setTimeout(function () {
                 self.element.focus();
                 core.restoreCaretPos();
-                document.execCommand("insertText", false, self.commandInput.val());
-                self.commandInput.val("");
+                document.execCommand("insertText", false, self.clipboardTextArea.val());
+                self.clipboardTextArea.val("");
+                self.clipboardTextArea.css("display", "none");
             }, 0);
         },
 
@@ -283,7 +291,7 @@
                 }
 
                 // create command
-                command = new commandClass(self.createContext());
+                command = new commandClass(self.createContext()); /* jshint ignore:line */
 
                 // execute command
                 self.executeCommand(command);
@@ -410,6 +418,10 @@
                         self.element.css("outline", self.outlineFocus);
                     }
                 }
+                var coords = self.element.offset();
+                var x = coords.left;
+                var y = coords.top - 100;
+                window.scrollTo(x, y);
             }
 
         },
@@ -478,7 +490,7 @@
             var parameters = parts.slice(1);
 
             // create command
-            var command = new commandClass(self.createContext({
+            var command = new commandClass(self.createContext({ /* jshint ignore:line */
                 parameters: parameters
             }));
 
@@ -629,7 +641,7 @@
         // navigation
         // ---------------------------------------------------------------------
         navigate: function (url) {
-            var url = core.url({
+            url = core.url({
                 url: url
             });
             if (core.endsWith(url.pathname, "mero.html")) {
