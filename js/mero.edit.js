@@ -7,6 +7,7 @@
     /* global $ */
     /* global location */
     /* global setTimeout */
+    /* global console */
 
     // =========================================================================
     // packages
@@ -69,16 +70,21 @@
             });
 
             // toolbar status field
-            this.statusSpan = $("<span class='' style='width:400px;float:left;margin-top:10px'>DIV</span>");
+            this.statusSpan = $("<span class='' style='width:800px;float:left;margin-top:10px'>DIV</span>");
             this.toolbarDiv.append(this.statusSpan);
 
             // toolbar buttons
-            this.createButtons(this.toolbarDiv);
+            //this.createButtons(this.toolbarDiv);
 
-            // invisible text input for capturing clipboard content
+            // invisible text input for capturing clipboard content without html tags
             this.clipboardTextArea = $("<textarea></textarea>");
             this.clipboardTextArea.css("display", "none");
             this.containerDiv.append(this.clipboardTextArea);
+
+            // invisible contenteditable div for capturing clipboard content with html tags
+            this.clipboardTextAreaHtml = $("<div contenteditable='true'></div>");
+            this.clipboardTextAreaHtml.css("display", "none");
+            this.containerDiv.append(this.clipboardTextAreaHtml);
 
             // create content
             this.contentDiv = $("<div tabindex=1 class='jse-content container'></div>");
@@ -241,20 +247,50 @@
         // handle paste event
         // ---------------------------------------------------------------------
         handlePaste: function (event) {
+            if (this.flagPasteHtml) {
+                this.handlePasteHtml(event); // ctrl+y
+                this.flagPasteHtml = false;
+            } else {
+                this.handlePasteText(event);
+            }
+        },
+
+        // ---------------------------------------------------------------------
+        // handle paste text
+        // ---------------------------------------------------------------------
+        handlePasteText: function (event) {
             var self = this;
             event.stopPropagation();
             core.getCaretPos();
             this.clipboardTextArea.css("display", "block");
             this.clipboardTextArea.val("");
             this.clipboardTextArea.focus();
-            //this.commandInput.val("");
-            //this.commandInput.focus();
             setTimeout(function () {
                 self.element.focus();
                 core.restoreCaretPos();
                 document.execCommand("insertText", false, self.clipboardTextArea.val());
                 self.clipboardTextArea.val("");
                 self.clipboardTextArea.css("display", "none");
+            }, 0);
+        },
+
+        // ---------------------------------------------------------------------
+        // handle paste html
+        // ---------------------------------------------------------------------
+        handlePasteHtml: function (event) {
+            var self = this;
+            event.stopPropagation();
+            this.clipboardTextAreaHtml.css("display", "block");
+            this.clipboardTextAreaHtml.html("");
+            this.clipboardTextAreaHtml.focus();
+            setTimeout(function () {
+                console.log(self.clipboardTextAreaHtml.html());
+                var command = new commands.PasteHtmlCommand(self.createContext({
+                    html: self.clipboardTextAreaHtml.html()
+                }));
+                self.executeCommand(command);
+                self.clipboardTextAreaHtml.html("");
+                self.clipboardTextAreaHtml.css("display", "none");
             }, 0);
         },
 
@@ -276,6 +312,9 @@
                 key = self.getCharCode(event);
                 if (key === 118) {
                     self.handlePaste(event);
+                } else if (key === 121) {
+                    event.stopPropagation();
+                    self.flagPasteHtml = !self.flagPasteHtml;
                 }
 
             } else if (event.altKey && event.keyCode !== 18) {

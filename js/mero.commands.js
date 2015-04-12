@@ -13,6 +13,7 @@
     var core = global.mero.core;
     global.mero.commands = {};
     var commands = global.mero.commands;
+    var tools = global.mero.tools;
     var module = commands;
 
     module.editableElement = '<span tabindex=1 contenteditable="true"></span>';
@@ -384,6 +385,37 @@
             this.insert();
             this.editor.assignHandlers(this.insertElement);
             this.editor.setElement(this.insertElement);
+        }
+    });
+
+    // =========================================================================
+    // paste html
+    // =========================================================================
+    module.PasteHtmlCommand = core.createDerivedClass(module.InsertBaseCommand, {
+        name: 'pasteHtml',
+        doc: 'Paste buffer as html after focused element.',
+        group: 'Tools',
+        execute: function () {
+            var self = this;
+            var refElement = this.element;
+            var insertElements = tools.filterHtml(this.html);
+            this.insertElements = [];
+            while (insertElements.children.length>0) {
+                var insertElement = $(insertElements.children.item(0));
+                refElement.after(insertElement); // this removes the node from insertElements
+                this.editor.assignHandlers(insertElement);
+                this.insertElements.push(insertElement);
+                refElement = insertElement;
+            }
+            window.setTimeout(function () {
+                self.editor.setElement(refElement);
+            }, 100);
+        },
+        undo: function () {
+            for (var i = 0; i < this.insertElements.length; ++i) {
+                var insertElement = this.insertElements[i];
+                insertElement[0].parentNode.removeChild(insertElement[0]);
+            }
         }
     });
 
