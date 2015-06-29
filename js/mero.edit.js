@@ -39,7 +39,7 @@
             this.containerDiv.append(this.navbarDiv);
             
             // create brand
-            this.navbarDiv.append('<a href="help.html">Merovech</a>');
+            this.navbarDiv.append('<a class="meroBrand" href="help.html">Merovech</a>');
 
             // create command input field
             this.commandInput = $("<input class='meroCommand' type='text'></input>");
