@@ -35,21 +35,15 @@
             self.outlineFocus = "1px dashed red";
 
             // create navbar
-            this.navbarDiv = $("<div class='navbar navbar-fixed-top'></div>");
+            this.navbarDiv = $("<div class='meroNavbar'></div>");
             this.containerDiv.append(this.navbarDiv);
-            this.toolbarDiv = $("<div class='navbar-inner'></div>");
-            this.navbarDiv.append(this.toolbarDiv);
-
+            
             // create brand
-            this.toolbarDiv.append('<a class="brand" href="help.html">Merovech</a>');
-
-            // create form (for commands and css status field)
-            this.inputForm = $('<form class="navbar-form pull-left" style="margin-right:10px"></form>');
-            this.toolbarDiv.append(this.inputForm);
+            this.navbarDiv.append('<a href="help.html">Merovech</a>');
 
             // create command input field
-            this.commandInput = $("<input class='span2' type='text' style='margin-right:10px;width:100px;'></input>");
-            this.inputForm.append(this.commandInput);
+            this.commandInput = $("<input class='meroCommand' type='text'></input>");
+            this.navbarDiv.append(this.commandInput);
             this.commandInput.keydown(function (event) {
                 self.handleCommandInputKey(event);
             });
@@ -63,17 +57,17 @@
             });
 
             // create css status field
-            this.cssInput = $("<input class='span2' type='text' style='width:50px;'></input>");
-            this.inputForm.append(this.cssInput);
+            this.cssInput = $("<input  class='meroCSS' type='text'></input>");
+            this.navbarDiv.append(this.cssInput);
             this.cssInput.keydown(function (event) {
                 self.handleCssInputKey(event);
             });
 
-            // toolbar status field
-            this.statusSpan = $("<span class='' style='width:800px;float:left;margin-top:10px'>DIV</span>");
-            this.toolbarDiv.append(this.statusSpan);
+            // status field
+            this.statusSpan = $("<span class='meroStatus'>DIV</span>");
+            this.navbarDiv.append(this.statusSpan);
 
-            // toolbar buttons
+            // buttons
             //this.createButtons(this.toolbarDiv);
 
             // invisible text input for capturing clipboard content without html tags
