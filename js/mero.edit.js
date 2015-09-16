@@ -468,7 +468,7 @@
             var y2 = y1 + $(window).height();
 
             // position of current element
-            var coords = self.element.offset();
+            var coords = this.element.offset();
             var x = coords.left;
             var y = coords.top;
 
