@@ -18,6 +18,111 @@
     var commands = global.mero.commands;
 
     // =========================================================================
+    // bootstrap
+    // =========================================================================
+    edit.bootstrap1 = function () {
+
+        // load config
+        var request = new window.XMLHttpRequest();
+        request.open('GET', 'meroconfig.js', false);
+        request.send(null);
+        if (request.status !== 200)
+            throw "HTTP GET failed:" + 'meroconfig.js';
+        var configText = request.responseText;
+
+        // eval config
+        var config;
+        eval(configText); // jshint ignore:line
+        edit.config = config;
+        if (edit.config.header) {
+            core.loadHtml(edit.config.header);
+        }
+
+    };
+
+    edit.bootstrap2 = function () {
+        commands.bootstrap();
+    };
+
+    // =========================================================================
+    // navigation stack
+    // =========================================================================
+    edit.NavStack = core.createClass({
+
+        init: function () {
+            this.elements = [];
+            this.index = -1;
+        },
+
+        reorg: function () {
+            if (this.elements.length === 0) {
+                return;
+            }
+            var i, element;
+            // check elements < index
+            for (i = 0; i < this.index; ++i) {
+                element = this.elements[i];
+                if (document.contains(element[0])) {
+                    continue;
+                } else {
+                    this.elements.splice(i, 1);
+                    i--;
+                    this.index--;
+                }
+            }
+            // check elements >=index
+            for (i = this.index; i < this.elements.length; ++i) {
+                element = this.elements[i];
+                if (document.contains(element[0])) {
+                    continue;
+                } else {
+                    if (i === this.index) {
+                        this.elements.splice(i, Infinity);
+                        this.index = this.elements.length - 1;
+                        return;
+                    }
+                    this.elements.splice(i, 1);
+                    i--;
+                }
+            }
+
+        },
+
+        navigate: function (element) {
+            this.reorg();
+            if (this.elements.length === 0) {
+                this.elements.push(element);
+                this.index = 0;
+                return;
+            }
+            var current = this.elements[this.index];
+            if (current === element) {
+                return;
+            }
+            this.elements.splice(this.index + 1, Infinity);
+            this.elements.push(element);
+            this.index++;
+        },
+
+        back: function () {
+            if (this.index < 1) {
+                return null;
+            }
+            this.index--;
+            return this.elements[this.index];
+        },
+
+        forward: function () {
+            if (this.index > this.elements.length - 2) {
+                return null;
+            }
+            this.index++;
+            return this.elements[this.index];
+        }
+
+    });
+
+    // =========================================================================
     // editor
     // =========================================================================
     edit.editor = core.createClass({
@@ -68,7 +173,11 @@
             this.navbarDiv.append(this.statusSpan);
 
             // buttons
-            //this.createButtons(this.toolbarDiv);
+            this.buttonsArea = $("<span class='meroButtons'></span>");
+            this.navbarDiv.append(this.buttonsArea);
+
+            // buttons
+            this.createButtons(this.buttonsArea);
 
             // invisible text input for capturing clipboard content without html tags
             this.clipboardTextArea = $("<textarea></textarea>");
@@ -110,6 +219,8 @@
                 this.createDefaultContent();
             }
 
+            // navigation stack
+            this.navStack = new edit.NavStack();
         },
 
         // ---------------------------------------------------------------------
@@ -172,9 +283,12 @@
                     return;
                 }
                 var prot = commandClass.prototype;
+                if(!edit.config || !edit.config.visibleButtonGroups || !edit.config.visibleButtonGroups[prot.buttonGroup]){
+                    return;
+                }
                 var group = groups[prot.buttonGroup];
                 if (!group) {
-                    group = $("<div class='btn-group'></div>");
+                    group = $("<span class='meroButttonGroup'></span>");
                     groups[prot.buttonGroup] = group;
                     container.append(group);
                 }
@@ -442,14 +556,14 @@
                     }
                 } else {
                     //if(self.element.get(0).tagName === 'SPAN' || self.element.text()===""){
-                    if (self.element.children().length === 0) {
-                        var editableElement = $(commands.editableElement);
-                        editableElement.text("span");
-                        self.element.append(editableElement);
-                        self.assignHandlers(self.element);
-                        self.element.focus();
-                        self.element.css("outline", self.outlineFocus);
-                    }
+                    /* if (self.element.children().length === 0) {
+                         var editableElement = $(commands.editableElement);
+                         editableElement.text("span");
+                         self.element.append(editableElement);
+                         self.assignHandlers(self.element);
+                         self.element.focus();
+                         self.element.css("outline", self.outlineFocus);
+                     }*/
                 }
 
                 self.scrollWindow();
@@ -477,6 +591,9 @@
                 window.scrollTo(x, y);
             } else if (y > y2) {
                 window.scrollTo(x, y);
+
+                // add element to nav stack
+                this.navStack.navigate(self.element);
             }
 
         },

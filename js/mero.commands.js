@@ -11,7 +11,7 @@
     // packages
     // =========================================================================
     var core = global.mero.core;
-    global.mero.commands = {};
+    global.mero.commands = global.mero.commands || {};
     var commands = global.mero.commands;
     var tools = global.mero.tools;
     var module = commands;
@@ -306,13 +306,27 @@
         group: 'Navigation',
         execute: function () {
             var newElement = this.element;
+            var level = 0;
             while (newElement.next().length === 0) {
                 newElement = newElement.parent();
+                level++;
                 if (newElement.length === 0 || newElement.hasClass('jse-content')) {
                     return;
                 }
             }
-            this.editor.setElement(newElement.next());
+            newElement = newElement.next();
+            if (newElement.length === 0) {
+                return;
+            }
+            /*while ((level--) > 0) {
+                var child = newElement.children(":first-child");
+                if (child.length === 0) {
+                    this.editor.setElement(newElement);
+                    return;
+                }
+                newElement = child;
+            }*/
+            this.editor.setElement(newElement);
         }
     });
 
@@ -351,6 +365,44 @@
                 return;
             }
             this.editor.setElement(newElement);
+        }
+    });
+
+    // =========================================================================
+    // history back
+    // =========================================================================
+    module.HistoryBackCommand = core.createDerivedClass(module.Command, {
+        name: 'hback',
+        charCode: 98,
+        doc: 'Move focus to last focused element.',
+        group: 'Navigation',
+        button: 'back',
+        buttonGroup: 'history',
+        execute: function () {
+            var element = this.editor.navStack.back();
+            if (!element) {
+                return;
+            }
+            this.editor.setElement(element);
+        }
+    });
+
+    // =========================================================================
+    // history forward
+    // =========================================================================
+    module.HistoryForwardCommand = core.createDerivedClass(module.Command, {
+        name: 'hforward',
+        charCode: 102,
+        doc: 'Move focus to next focused element.',
+        group: 'Navigation',
+        button: 'forward',
+        buttonGroup: 'history',                                                           
+        execute: function () {
+            var element = this.editor.navStack.forward();
+            if (!element) {
+                return;
+            }
+            this.editor.setElement(element);
         }
     });
 
@@ -400,7 +452,7 @@
             var refElement = this.element;
             var insertElements = tools.filterHtml(this.html);
             this.insertElements = [];
-            while (insertElements.children.length>0) {
+            while (insertElements.children.length > 0) {
                 var insertElement = $(insertElements.children.item(0));
                 refElement.after(insertElement); // this removes the node from insertElements
                 this.editor.assignHandlers(insertElement);
@@ -918,6 +970,10 @@
         name: 'thumbnails',
         doc: 'Create thumbnails.',
         group: 'Tools',
+        synopsis: 'load [<i>thumbnailPath</i>]',
+        parameterDoc: {
+            'thumbnailPath': 'Path to images'
+        },
         setParameters: function () {
             module.InsertBaseCommand.prototype.setParameters.apply(this, arguments);
             if (this.parameters.length < 1) {
@@ -957,7 +1013,7 @@
             $.when.apply(null, defs).then(function () {
                 for (var i = 0; i < pics.length; ++i) {
                     var pic = pics[i];
-                    self.insertElement.append("<img src=\"" + pic + "\" class=\"ib is2\">");
+                    self.insertElement.append("<img src=\"" + pic + "\" class=\"ib is1\">");
                 }
                 self.editor.assignHandlers(self.insertElement);
                 self.editor.setElement(self.insertElement);
@@ -965,15 +1021,23 @@
         }
     });
 
-    // =========================================================================
-    // create map: command by key
-    // =========================================================================
-    (function () {
 
+
+
+
+
+    // =========================================================================
+    // create map: command by name
+    // =========================================================================
+    module.bootstrap = function () {
+
+        var key, command;
+
+        // key map
         module.commandByKey = {};
 
-        for (var key in module) {
-            var command = module[key];
+        for (key in module) {
+            command = module[key];
             if (!command.prototype) {
                 continue;
             }
@@ -993,17 +1057,10 @@
             }
         }
 
-    })();
-
-    // =========================================================================
-    // create map: command by name
-    // =========================================================================
-    (function () {
-
+        // name map
         module.commandByName = {};
-
-        for (var key in module) {
-            var command = module[key];
+        for (key in module) {
+            command = module[key];
             if (!command.prototype || !command.prototype.name) {
                 continue;
             }
@@ -1013,6 +1070,7 @@
             module.commandByName[command.prototype.name] = command;
         }
 
-    })();
+    };
+
 
 }(this));

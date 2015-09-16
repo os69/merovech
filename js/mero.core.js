@@ -3,7 +3,7 @@
     "use strict";
     /*global window */
     /*global $  */
-    /*global document */
+    /*global document, less, XMLHttpRequest */
 
     // =========================================================================
     // packages
@@ -78,7 +78,7 @@
                 target[name] = source[name];
             }
         }
-    },
+    };
 
     // =========================================================================
     // remove list2 elements from list1
@@ -126,7 +126,7 @@
                 }
             }],
             title: options.title
-            // width:"600px"
+                // width:"600px"
         });
     };
 
@@ -332,16 +332,16 @@
             // load the template - and be sure to cache the result.
             var fn = !/\W/.test(str) ? cache[str] = cache[str] || tmpl(document.getElementById(str).innerHTML) :
 
-            // Generate a reusable function that will serve as a template
-            // generator (and which will be cached).
-            new Function("obj", "var p=[],print=function(){p.push.apply(p,arguments);};" +
+                // Generate a reusable function that will serve as a template
+                // generator (and which will be cached).
+                new Function("obj", "var p=[],print=function(){p.push.apply(p,arguments);};" +
 
-                // Introduce the data as local variables using with(){}
-                "with(obj){p.push('" +
+                    // Introduce the data as local variables using with(){}
+                    "with(obj){p.push('" +
 
-                // Convert the template into pure JavaScript
-                str.replace(/[\r\t\n]/g, " ").split("<%").join("\t").replace(/((^|%>)[^\t]*)'/g, "$1\r").replace(/\t=(.*?)%>/g, "',$1,'").split("\t").join("');").split("%>")
-                .join("p.push('").split("\r").join("\\'") + "');}return p.join('');");
+                    // Convert the template into pure JavaScript
+                    str.replace(/[\r\t\n]/g, " ").split("<%").join("\t").replace(/((^|%>)[^\t]*)'/g, "$1\r").replace(/\t=(.*?)%>/g, "',$1,'").split("\t").join("');").split("%>")
+                    .join("p.push('").split("\r").join("\\'") + "');}return p.join('');");
 
             // Provide some basic currying to the user
             return data ? fn(data) : fn;
@@ -444,9 +444,10 @@
             var newMap = core.map(newFields, function (field) {
                 return field.name;
             });
+            var oldField, newField;
             for (var i = 0; i < newFields.length; ++i) {
-                var newField = newFields[i];
-                var oldField = oldMap[newField.name];
+                newField = newFields[i];
+                oldField = oldMap[newField.name];
                 if (!oldField) {
                     delta.addedFields.push({
                         name: newField.name,
@@ -462,9 +463,9 @@
                     }
                 }
             }
-            for (var i = 0; i < oldFields.length; ++i) {
-                var oldField = oldFields[i];
-                var newField = newMap[oldField.name];
+            for (i = 0; i < oldFields.length; ++i) {
+                oldField = oldFields[i];
+                newField = newMap[oldField.name];
                 if (!newField) {
                     delta.deletedFields.push({
                         name: oldField.name,
@@ -536,6 +537,18 @@
             less.sheets.push(link.get(0));
             less.refresh();
         }
+    };
+
+    // ===================================================================
+    // load html
+    // ===================================================================
+    core.loadHtml = function (path) {
+        var request = new XMLHttpRequest();
+        request.open('GET', path, false);
+        request.send(null);
+        if (request.status !== 200)
+            throw "HTTP GET failed:" + path;
+        document.write(request.responseText); // jshint ignore:line
     };
 
 })(this);

@@ -7,23 +7,24 @@
 
     <LINK href="lib/css/ui-lightness/jquery-ui-1.8.23.custom.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet/less" type="text/css" href="css/mero.less">
-    <script src="lib/less.js" type="text/javascript"></script>        
+    <script src="lib/less.js" type="text/javascript"></script>
     <script src="lib/jquery-1.8.0.min.js" type="text/javascript"></script>
     <script src="lib/jquery-ui-1.8.23.custom.min.js" type="text/javascript"></script>
     <script src="js/mero.core.js"></script>
-    <script src="js/mero.tools.js"></script>        
+    <script src="js/mero.tools.js"></script>
     <script src="js/mero.commands.js"></script>
-    
+    <script src="js/mero.edit.js"></script>
     <title>Merovech</title>
 
 </head>
 
 <body style='padding-top: 90px'>
 
-    <script src="js/mero.edit.js"></script>
-    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
-
     <script type="text/javascript">
+        window.mero.edit.bootstrap1();
+    </script>
+    <script type="text/javascript">
+        window.mero.edit.bootstrap2();
         window.mero.edit.editor($("body"));
     </script>
 
