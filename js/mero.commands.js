@@ -396,7 +396,7 @@
         doc: 'Move focus to next focused element.',
         group: 'Navigation',
         button: 'forward',
-        buttonGroup: 'history',                                                           
+        buttonGroup: 'history',
         execute: function () {
             var element = this.editor.navStack.forward();
             if (!element) {
@@ -587,6 +587,7 @@
     // =========================================================================
     module.AttributeDialogCommand = core.createDerivedClass(module.Command, {
         name: 'attr',
+        char: 'a',
         doc: 'Opens a dialog for editing the attributes of the focused element.',
         group: 'Tools',
         execute: function () {

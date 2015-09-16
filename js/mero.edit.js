@@ -1,4 +1,4 @@
-(function(global) {
+(function (global) {
     "use strict";
 
     /* global window */
@@ -130,7 +130,7 @@
         // ---------------------------------------------------------------------
         // init
         // ---------------------------------------------------------------------
-        init: function(parent) {
+        init: function (parent) {
 
             // create main container
             var self = this;
@@ -149,14 +149,14 @@
             // create command input field
             this.commandInput = $("<input class='meroCommand' type='text'></input>");
             this.navbarDiv.append(this.commandInput);
-            this.commandInput.keydown(function(event) {
+            this.commandInput.keydown(function (event) {
                 self.handleCommandInputKey(event);
             });
 
             // autocomplete for command input field
             this.autocompleteList = [];
             this.commandInput.autocomplete({
-                source: function() {
+                source: function () {
                     self.autocomplete.apply(self, arguments);
                 }
             });
@@ -164,7 +164,7 @@
             // create css status field
             this.cssInput = $("<input  class='meroCSS' type='text'></input>");
             this.navbarDiv.append(this.cssInput);
-            this.cssInput.keydown(function(event) {
+            this.cssInput.keydown(function (event) {
                 self.handleCssInputKey(event);
             });
 
@@ -226,7 +226,7 @@
         // ---------------------------------------------------------------------
         // create default content
         // ---------------------------------------------------------------------
-        createDefaultContent: function() {
+        createDefaultContent: function () {
             this.contentDiv.empty();
             this.contentDiv.append($("<h1 tabindex=1 contenteditable='true'>Heading1</h1>"));
             this.assignHandlers(this.contentDiv);
@@ -236,54 +236,54 @@
         // ---------------------------------------------------------------------
         // key events command input
         // ---------------------------------------------------------------------
-        handleCommandInputKey: function(event) {
+        handleCommandInputKey: function (event) {
             var self = this;
             switch (event.keyCode) {
-                case 13:
-                    event.preventDefault();
-                    // async needed if command is choosen from history (don't know why)
-                    setTimeout(function() {
-                        self.executeCommandLine();
-                        self.element.focus();
-                    }, 0);
-                    break;
-                case 27:
+            case 13:
+                event.preventDefault();
+                // async needed if command is choosen from history (don't know why)
+                setTimeout(function () {
+                    self.executeCommandLine();
                     self.element.focus();
-                    break;
+                }, 0);
+                break;
+            case 27:
+                self.element.focus();
+                break;
             }
         },
 
         // ---------------------------------------------------------------------
         // key events css status field
         // ---------------------------------------------------------------------
-        handleCssInputKey: function(event) {
+        handleCssInputKey: function (event) {
             var self = this;
             switch (event.keyCode) {
-                case 13:
-                    event.preventDefault();
-                    var cssClasses = self.cssInput.val();
-                    self.element.attr("class", cssClasses);
-                    self.element.focus();
-                    break;
-                case 27:
-                    self.element.focus();
-                    break;
+            case 13:
+                event.preventDefault();
+                var cssClasses = self.cssInput.val();
+                self.element.attr("class", cssClasses);
+                self.element.focus();
+                break;
+            case 27:
+                self.element.focus();
+                break;
             }
         },
 
         // ---------------------------------------------------------------------
         // create buttons
         // ---------------------------------------------------------------------
-        createButtons: function(toolbar) {
+        createButtons: function (toolbar) {
             var self = this;
             var container = toolbar;
             var groups = {};
-            $.each(commands, function(key, commandClass) {
+            $.each(commands, function (key, commandClass) {
                 if (!commandClass.prototype || !commandClass.prototype.button || !commandClass.prototype.buttonGroup) {
                     return;
                 }
                 var prot = commandClass.prototype;
-                if(!edit.config || !edit.config.visibleButtonGroups || !edit.config.visibleButtonGroups[prot.buttonGroup]){
+                if (!edit.config || !edit.config.visibleButtonGroups || !edit.config.visibleButtonGroups[prot.buttonGroup]) {
                     return;
                 }
                 var group = groups[prot.buttonGroup];
@@ -299,7 +299,7 @@
                     button.attr("title", "ALT+" + commandClass.prototype.char.toUpperCase());
                 }
                 group.append(button);
-                button.click(function() {
+                button.click(function () {
                     if (prot.buttonTemplate) {
                         self.executeCommandLineInit();
                         self.commandInput.val(prot.buttonTemplate);
@@ -315,7 +315,7 @@
         // ---------------------------------------------------------------------
         // create command context
         // ---------------------------------------------------------------------
-        createContext: function(obj) {
+        createContext: function (obj) {
             return $.extend({
                 element: this.element,
                 copyElement: this.copyElement,
@@ -326,7 +326,7 @@
         // ---------------------------------------------------------------------
         // autocomplete
         // ---------------------------------------------------------------------
-        autocomplete: function(input, cb) {
+        autocomplete: function (input, cb) {
             var list = [];
             for (var i = 0; i < this.autocompleteList.length; ++i) {
                 var term = this.autocompleteList[i];
@@ -340,7 +340,7 @@
         // ---------------------------------------------------------------------
         // get character code from event
         // ---------------------------------------------------------------------
-        getCharCode: function(event) {
+        getCharCode: function (event) {
             var key;
             if (event.keyCode !== 0) {
                 key = event.keyCode;
@@ -354,7 +354,7 @@
         // ---------------------------------------------------------------------
         // handle paste event
         // ---------------------------------------------------------------------
-        handlePaste: function(event) {
+        handlePaste: function (event) {
             if (this.flagPasteHtml) {
                 this.handlePasteHtml(event); // ctrl+y
                 this.flagPasteHtml = false;
@@ -366,14 +366,14 @@
         // ---------------------------------------------------------------------
         // handle paste text
         // ---------------------------------------------------------------------
-        handlePasteText: function(event) {
+        handlePasteText: function (event) {
             var self = this;
             event.stopPropagation();
             core.getCaretPos();
             this.clipboardTextArea.css("display", "block");
             this.clipboardTextArea.val("");
             this.clipboardTextArea.focus();
-            setTimeout(function() {
+            setTimeout(function () {
                 self.element.focus();
                 core.restoreCaretPos();
                 document.execCommand("insertText", false, self.clipboardTextArea.val());
@@ -385,13 +385,13 @@
         // ---------------------------------------------------------------------
         // handle paste html
         // ---------------------------------------------------------------------
-        handlePasteHtml: function(event) {
+        handlePasteHtml: function (event) {
             var self = this;
             event.stopPropagation();
             this.clipboardTextAreaHtml.css("display", "block");
             this.clipboardTextAreaHtml.html("");
             this.clipboardTextAreaHtml.focus();
-            setTimeout(function() {
+            setTimeout(function () {
                 console.log(self.clipboardTextAreaHtml.html());
                 var command = new commands.PasteHtmlCommand(self.createContext({
                     html: self.clipboardTextAreaHtml.html()
@@ -405,7 +405,7 @@
         // ---------------------------------------------------------------------
         // handle key events of html elements
         // ---------------------------------------------------------------------
-        handle: function(element, event) {
+        handle: function (element, event) {
 
             var self = this;
             //self.element = $(element);
@@ -453,17 +453,17 @@
                 // 3. OTHERS
                 // -------------------------------------------------------------
                 switch (event.keyCode) {
-                    case 'dummy':
-                        break;
-                    case 27:
-                        event.stopPropagation();
-                        event.preventDefault();
-                        this.executeCommandLineInit();
-                        break;
-                    case 9:
-                        event.stopPropagation();
-                        event.preventDefault();
-                        break;
+                case 'dummy':
+                    break;
+                case 27:
+                    event.stopPropagation();
+                    event.preventDefault();
+                    this.executeCommandLineInit();
+                    break;
+                case 9:
+                    event.stopPropagation();
+                    event.preventDefault();
+                    break;
                 }
             }
 
@@ -472,7 +472,7 @@
         // ---------------------------------------------------------------------
         // execute command
         // ---------------------------------------------------------------------
-        executeCommand: function(command, pushOnStack) {
+        executeCommand: function (command, pushOnStack) {
 
             // execute command
             try {
@@ -503,7 +503,7 @@
         // ---------------------------------------------------------------------
         // check for parent element with contenteditable = true
         // ---------------------------------------------------------------------
-        checkForParentContentEditable: function(element) {
+        checkForParentContentEditable: function (element) {
 
             if (!element || element.length === 0) return element;
 
@@ -522,7 +522,7 @@
         // ---------------------------------------------------------------------
         // set current focus element
         // ---------------------------------------------------------------------
-        setElement: function(element) {
+        setElement: function (element) {
             var self = this;
 
             element = self.checkForParentContentEditable(element);
@@ -538,11 +538,11 @@
                 self.cssInput.val(self.getCss());
             }
 
-            if (self.element.length > 0) {
+            if (self.element.length > 0) {              
                 self.element.focus();
                 self.element.css("outline", self.outlineFocus);
                 if (self.element.get(0).tagName === 'IMG') {
-                    self.element.one('load', function() {
+                    self.element.one('load', function () {                       
                         self.element.focus();
                         self.element.css("outline", self.outlineFocus);
                     });
@@ -550,7 +550,7 @@
                 if (self.element.attr("contenteditable") === "true") {
                     if (self.element.text() === "") {
                         self.element.text(self.element.get(0).tagName.toLowerCase());
-                        core.selectText(self.element.get(0));
+                        core.selectText(self.element.get(0));                       
                         self.element.focus();
                         self.element.css("outline", self.outlineFocus);
                     }
@@ -566,6 +566,10 @@
                      }*/
                 }
 
+                // add element to nav stack
+                this.navStack.navigate(self.element);
+                
+                // scroll window
                 self.scrollWindow();
 
             }
@@ -573,42 +577,40 @@
         },
 
         // ---------------------------------------------------------------------
-        // scroll window
+        // scroll window (avoid that focused element is hided by overlay toolbar)
         // ---------------------------------------------------------------------
-        scrollWindow: function() {
-
-            // visible area
-            var y1 = $(window).scrollTop();
-            var y2 = y1 + $(window).height();
-
-            // position of current element
+        scrollWindow: function () {
+         
+            // margin
+            var marginTop = this.navbarDiv.height() + 20;
+            
+            // get visible area (make a little bit smaller to ensure that element will be visible)
+            var y1 = $(window).scrollTop() + marginTop;
+            
+            // get position of current element
             var coords = this.element.offset();
             var x = coords.left;
             var y = coords.top;
 
-            // adjust if not visible
+            // adjust window scroll position to make element visible
             if (y < y1) {
-                window.scrollTo(x, y);
-            } else if (y > y2) {
-                window.scrollTo(x, y);
-
-                // add element to nav stack
-                this.navStack.navigate(self.element);
+                window.scrollTo(x, y - marginTop);
             }
+            
 
         },
 
         // ---------------------------------------------------------------------
         // get css classes of focus element
         // ---------------------------------------------------------------------
-        getCss: function() {
+        getCss: function () {
             return this.element.attr("class");
         },
 
         // ---------------------------------------------------------------------
         // get dom path of focus element
         // ---------------------------------------------------------------------
-        getPath: function() {
+        getPath: function () {
             var path = [];
             var element = this.element;
             var hasParent = true;
@@ -630,7 +632,7 @@
         // ---------------------------------------------------------------------
         // execute command line init
         // ---------------------------------------------------------------------
-        executeCommandLineInit: function() {
+        executeCommandLineInit: function () {
             var self = this;
             self.commandInput.focus();
             self.commandInput.val("");
@@ -639,7 +641,7 @@
         // ---------------------------------------------------------------------
         // execute command line
         // ---------------------------------------------------------------------
-        executeCommandLine: function() {
+        executeCommandLine: function () {
 
             // split command line into parts
             var self = this;
@@ -683,7 +685,7 @@
         // --------------------------------------------------------------------
         // load page
         // ---------------------------------------------------------------------
-        loadPage: function(pageName) {
+        loadPage: function (pageName) {
             var self = this;
             if (!pageName) {
                 pageName = core.url().parameter("page");
@@ -693,7 +695,7 @@
             }
             $.ajax({
                 url: pageName + ".html",
-                success: function(data) {
+                success: function (data) {
 
 
                     // clear old content
@@ -704,7 +706,7 @@
                     self.assignHandlers(self.contentDiv);
 
                     // set focus to first contenteditable
-                    setTimeout(function() {
+                    setTimeout(function () {
                         var focusElement = $(".jse-content").find('[contenteditable="true"]');
                         focusElement = $(focusElement.get(0));
                         if (focusElement.length > 0) {
@@ -722,9 +724,9 @@
 
                 },
                 dataType: 'text'
-            }).error(function() {
+            }).error(function () {
                 alert("Cannot load page '" + pageName + "' error:" + arguments[0].statusText);
-            }).success(function() {
+            }).success(function () {
                 self.commandStack = [];
                 // alert("ok");
             });
@@ -735,7 +737,7 @@
         // --------------------------------------------------------------------
         // save page
         // ---------------------------------------------------------------------
-        savePage: function(pageName) {
+        savePage: function (pageName) {
 
             var self = this;
 
@@ -759,9 +761,9 @@
                 data: content,
                 processData: false,
                 dataType: 'text'
-            }).error(function() {
+            }).error(function () {
                 alert("error:" + arguments[0].statusText);
-            }).success(function() {
+            }).success(function () {
                 core.url().parameter("page", pageName).submit();
                 self.element.css("outline", self.outlineFocus);
                 alert("Page '" + pageName + "' saved.");
@@ -772,7 +774,7 @@
         // --------------------------------------------------------------------
         // assignHandlers
         // ---------------------------------------------------------------------
-        assignHandlers: function(node) {
+        assignHandlers: function (node) {
             // node itself
             var filtered = node.filter(this.relevantElements);
             this.assignByElements(filtered);
@@ -783,14 +785,14 @@
         // --------------------------------------------------------------------
         // assign by elements
         // ---------------------------------------------------------------------
-        assignByElements: function(elements) {
+        assignByElements: function (elements) {
             var self = this;
             elements.off("keydown"); // keypress
-            elements.keydown(function(event) { // keypress
+            elements.keydown(function (event) { // keypress
                 self.handle(this, event);
             });
             elements.off("click");
-            elements.click(function(event) {
+            elements.click(function (event) {
                 if ($(this).hasClass("jse-content")) {
                     return;
                 }
@@ -798,12 +800,12 @@
                 event.stopPropagation();
             });
             elements.filter("a").off("dblclick");
-            elements.filter("a").dblclick(function() {
+            elements.filter("a").dblclick(function () {
                 var link = $(this).attr("href");
                 self.navigate(link);
             });
             elements.filter("a").off("click");
-            elements.filter("a").click(function() {
+            elements.filter("a").click(function () {
                 var link = $(this).attr("href");
                 self.navigate(link);
             });
@@ -812,7 +814,7 @@
         // ---------------------------------------------------------------------
         // navigation
         // ---------------------------------------------------------------------
-        navigate: function(url) {
+        navigate: function (url) {
             var urlParsed = core.url({
                 url: url
             });
@@ -828,28 +830,28 @@
         // ---------------------------------------------------------------------
         // make static
         // ---------------------------------------------------------------------
-        makeStatic: function() {
+        makeStatic: function () {
             this.content.find("*").attr("contenteditable", false);
         },
 
         // ---------------------------------------------------------------------
         // save selection
         // ---------------------------------------------------------------------
-        saveSelection: function() {
+        saveSelection: function () {
             this.selection = core.saveSelection();
         },
 
         // ---------------------------------------------------------------------
         // restore selection
         // ---------------------------------------------------------------------
-        restoreSelection: function() {
+        restoreSelection: function () {
             core.restoreSelection(this.selection);
         },
 
         // ---------------------------------------------------------------------
         // find sibling
         // ---------------------------------------------------------------------
-        findSibling: function(element, type) {
+        findSibling: function (element, type) {
             if (element.is(type)) {
                 return element;
             }
