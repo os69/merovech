@@ -21,6 +21,26 @@
     module.relevantElements = "ul, ol, li, div, pre, p, h1, h2, h3, input, img, table, tbody, tr, td, a, span, b, i";
 
     // =========================================================================
+    // parameter completion
+    // =========================================================================
+    module.completeParameter = function (value, allowedValues) {
+        var completedValue;
+        for (var i = 0; i < allowedValues.length; ++i) {
+            var allowedValue = allowedValues[i];
+            if (allowedValue.indexOf(value) === 0) {
+                if (completedValue) {
+                    throw "Parameter value '" + value + "' not unique. Possible values: '" + allowedValue + "' and '" + completedValue + "'";
+                }
+                completedValue = allowedValue;
+            }
+        }
+        if (!completedValue) {
+            throw "Unkown parameter value '" + value + "'. Allowed values:"+ allowedValues.join(",");
+        }
+        return completedValue;
+    };
+
+    // =========================================================================
     // base class commands
     // =========================================================================
     module.Command = core.createClass({
@@ -85,6 +105,7 @@
     // =========================================================================
     module.InsertBaseCommand = core.createDerivedClass(module.Command, {
 
+        parameterValues: ['after', 'before', 'prepend', 'append', 'sibling', 'leaf', 'container', 'editable', 'not-editable'],
         insertMode: 'after',
 
         insert: function () {
@@ -129,9 +150,10 @@
 
             // evaluate parameters
             for (var i = fromIndex; i < this.parameters.length; ++i) {
-                var parameter = this.parameters[i];
-                switch (parameter) {
 
+                var parameter = module.completeParameter(this.parameters[i], this.parameterValues);
+
+                switch (parameter) {
                 case 'after':
                     this.insertMode = "after";
                     break;
@@ -147,7 +169,6 @@
                 case 'sibling':
                     this.insertMode = "sibling";
                     break;
-
                 }
             }
 
@@ -206,11 +227,12 @@
 
             // evaluate parameters
             for (var i = fromIndex; i < this.parameters.length; ++i) {
-                var parameter = this.parameters[i];
-                switch (parameter) {
 
-                case 'leaf':
+                var parameter = module.completeParameter(this.parameters[i], this.parameterValues);
+
+                switch (parameter) {
                 case 'editable':
+                case 'leaf':
                     if (!this.editable) {
                         if (this.switchEditable) {
                             this.editable = true;

@@ -54,6 +54,11 @@
             this.index = -1;
         },
 
+        clear: function () {
+            this.elements = [];
+            this.index = -1;
+        },
+
         reorg: function () {
             if (this.elements.length === 0) {
                 return;
@@ -211,6 +216,9 @@
                 core.loadStyleSheet(less);
             }
 
+            // navigation stack
+            this.navStack = new edit.NavStack();
+
             // load page           
             var pageName = core.url().parameter("page");
             if (pageName) {
@@ -219,8 +227,6 @@
                 this.createDefaultContent();
             }
 
-            // navigation stack
-            this.navStack = new edit.NavStack();
         },
 
         // ---------------------------------------------------------------------
@@ -538,11 +544,11 @@
                 self.cssInput.val(self.getCss());
             }
 
-            if (self.element.length > 0) {              
+            if (self.element.length > 0) {
                 self.element.focus();
                 self.element.css("outline", self.outlineFocus);
                 if (self.element.get(0).tagName === 'IMG') {
-                    self.element.one('load', function () {                       
+                    self.element.one('load', function () {
                         self.element.focus();
                         self.element.css("outline", self.outlineFocus);
                     });
@@ -550,7 +556,7 @@
                 if (self.element.attr("contenteditable") === "true") {
                     if (self.element.text() === "") {
                         self.element.text(self.element.get(0).tagName.toLowerCase());
-                        core.selectText(self.element.get(0));                       
+                        core.selectText(self.element.get(0));
                         self.element.focus();
                         self.element.css("outline", self.outlineFocus);
                     }
@@ -568,7 +574,7 @@
 
                 // add element to nav stack
                 this.navStack.navigate(self.element);
-                
+
                 // scroll window
                 self.scrollWindow();
 
@@ -580,13 +586,13 @@
         // scroll window (avoid that focused element is hided by overlay toolbar)
         // ---------------------------------------------------------------------
         scrollWindow: function () {
-         
+
             // margin
             var marginTop = this.navbarDiv.height() + 20;
-            
+
             // get visible area (make a little bit smaller to ensure that element will be visible)
             var y1 = $(window).scrollTop() + marginTop;
-            
+
             // get position of current element
             var coords = this.element.offset();
             var x = coords.left;
@@ -596,7 +602,7 @@
             if (y < y1) {
                 window.scrollTo(x, y - marginTop);
             }
-            
+
 
         },
 
@@ -701,9 +707,15 @@
                     // clear old content
                     self.contentDiv.empty();
 
+                    // clear navigation
+                    self.navStack.clear();
+
                     // append new content
                     self.contentDiv.append($(data));
                     self.assignHandlers(self.contentDiv);
+
+                    // adjust url
+                    core.url().parameter("page", pageName).submit();
 
                     // set focus to first contenteditable
                     setTimeout(function () {
@@ -713,14 +725,6 @@
                             self.setElement(focusElement);
                         }
                     }, 10);
-
-                    /*  setTimeout(function(){
-                        jQuery.event.trigger({ type : 'keypress', which : 9 });
-                    },2000);*/
-
-
-                    // adjust url
-                    core.url().parameter("page", pageName).submit();
 
                 },
                 dataType: 'text'
