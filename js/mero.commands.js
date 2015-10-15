@@ -21,6 +21,65 @@
     module.relevantElements = "ul, ol, li, div, pre, p, h1, h2, h3, input, img, table, tbody, tr, td, a, span, b, i";
 
     // =========================================================================
+    // determine sibling
+    // =========================================================================
+    module.siblingElement = function (element, direction) {
+        var depth = 0;
+        var first = true;
+        var siblingElement;
+
+        element = element.get(0);
+
+        switch (direction) {
+        case 'next':
+            siblingElement = 'nextElementSibling';
+            break;
+        case 'previous':
+            siblingElement = 'previousElementSibling';
+            break;
+        }
+
+        var getSibling = function (element, depth) {
+            while (true) {
+                if (element[siblingElement]) {
+                    return {
+                        sibling: element[siblingElement],
+                        depth: depth
+                    };
+                }
+                element = element.parentElement;
+                depth = depth - 1;
+                if (!element || element.classList.contains('jse-content')) {
+                    return null;
+                }
+            }
+        };
+
+        while (true) {
+            if (depth === 0 && !first) {
+                return $(element);
+            }
+            if (element.children.length > 0 && !first) {
+                if (direction === 'next') {
+                    element = element.children.item(0);
+                } else {
+                    element = element.children.item(element.children.length - 1);
+                }
+                depth = depth + 1;
+            } else {
+                first = false;
+                var sibling = getSibling(element, depth);
+                if (!sibling) {
+                    return null;
+                }
+                element = sibling.sibling;
+                depth = sibling.depth;
+            }
+        }
+
+    };
+
+    // =========================================================================
     // parameter completion
     // =========================================================================
     module.completeParameter = function (value, allowedValues) {
@@ -35,7 +94,7 @@
             }
         }
         if (!completedValue) {
-            throw "Unkown parameter value '" + value + "'. Allowed values:"+ allowedValues.join(",");
+            throw "Unkown parameter value '" + value + "'. Allowed values:" + allowedValues.join(",");
         }
         return completedValue;
     };
@@ -306,14 +365,7 @@
         doc: 'Move focus to preceding dom element.',
         group: 'Navigation',
         execute: function () {
-            var newElement = this.element.prev();
-            if (newElement.length === 0) {
-                newElement = this.element.parent();
-                if (newElement.hasClass('jse-content')) {
-                    return;
-                }
-            }
-            this.editor.setElement(newElement);
+            this.editor.setElement(module.siblingElement(this.element, 'previous'));
         }
     });
 
@@ -327,28 +379,7 @@
         doc: 'Move focus to next dom element.',
         group: 'Navigation',
         execute: function () {
-            var newElement = this.element;
-            var level = 0;
-            while (newElement.next().length === 0) {
-                newElement = newElement.parent();
-                level++;
-                if (newElement.length === 0 || newElement.hasClass('jse-content')) {
-                    return;
-                }
-            }
-            newElement = newElement.next();
-            if (newElement.length === 0) {
-                return;
-            }
-            /*while ((level--) > 0) {
-                var child = newElement.children(":first-child");
-                if (child.length === 0) {
-                    this.editor.setElement(newElement);
-                    return;
-                }
-                newElement = child;
-            }*/
-            this.editor.setElement(newElement);
+            this.editor.setElement(module.siblingElement(this.element, 'next'));
         }
     });
 
@@ -985,69 +1016,6 @@
         group: 'Tables',
         template: '<td tabindex=1><%=editableElement%></td>'
     });
-
-    // =========================================================================
-    // thumbnails
-    // =========================================================================
-    module.ThumbnailCommand = core.createDerivedClass(module.InsertBaseCommand, {
-        name: 'thumbnails',
-        doc: 'Create thumbnails.',
-        group: 'Tools',
-        synopsis: 'load [<i>thumbnailPath</i>]',
-        parameterDoc: {
-            'thumbnailPath': 'Path to images'
-        },
-        setParameters: function () {
-            module.InsertBaseCommand.prototype.setParameters.apply(this, arguments);
-            if (this.parameters.length < 1) {
-                throw "Missing parameter url";
-            }
-            this.url = this.parameters[0];
-        },
-        pad: function (text, length) {
-            return "0000000000".slice(0, length - text.length) + text;
-        },
-        execute: function () {
-
-            var self = this;
-
-            // create element and insert
-            this.insertElement = $("<div tabindex=1></div>");
-            this.insert();
-
-            // check for images
-            var prefix = this.url.split("_")[0];
-            var pics = [];
-            var defs = [];
-            for (var i = 0; i <= 20; ++i) {
-                (function () { /* jshint ignore:line */
-                    var d = $.Deferred();
-                    defs.push(d.promise());
-                    var name = prefix + "_" + self.pad("" + i, 3) + ".jpg";
-                    $.get(name).done(function () {
-                        pics.push(name);
-                    }).always(function () {
-                        d.resolve();
-                    });
-                })(); /* jshint ignore:line */
-            }
-
-            // execute when image check is finished
-            $.when.apply(null, defs).then(function () {
-                for (var i = 0; i < pics.length; ++i) {
-                    var pic = pics[i];
-                    self.insertElement.append("<img src=\"" + pic + "\" class=\"ib is1\">");
-                }
-                self.editor.assignHandlers(self.insertElement);
-                self.editor.setElement(self.insertElement);
-            });
-        }
-    });
-
-
-
-
-
 
     // =========================================================================
     // create map: command by name

@@ -533,52 +533,90 @@
 
             element = self.checkForParentContentEditable(element);
 
-            if (element && element.length > 0) {
-                if (self.element) {
-                    self.element.css("outline", "0");
-                }
-                self.element = element;
-                var path = self.getPath();
-                self.statusSpan.text(path);
-                self.statusSpan.attr("title", path);
-                self.cssInput.val(self.getCss());
+            // do we have a new element?
+            if (!element || element.length === 0) {
+                return;
             }
 
-            if (self.element.length > 0) {
-                self.element.focus();
-                self.element.css("outline", self.outlineFocus);
-                if (self.element.get(0).tagName === 'IMG') {
-                    self.element.one('load', function () {
-                        self.element.focus();
-                        self.element.css("outline", self.outlineFocus);
-                    });
+            // remove outline from old element
+            if (self.element) {
+                self.element.css("outline", "0");
+            }
+
+            // delayed focus for images
+            if (element.get(0).tagName === 'IMG') {
+                element.one('load', function () {
+                    element.focus();
+                    element.css("outline", self.outlineFocus);
+                });
+            }
+
+            if (element.attr("contenteditable") === "true") {
+                // conteneditable with no text -> fill default text
+                if (element.text() === "") {
+                    element.text(element.get(0).tagName.toLowerCase());
+                    core.selectText(element.get(0));
                 }
-                if (self.element.attr("contenteditable") === "true") {
-                    if (self.element.text() === "") {
-                        self.element.text(self.element.get(0).tagName.toLowerCase());
-                        core.selectText(self.element.get(0));
-                        self.element.focus();
-                        self.element.css("outline", self.outlineFocus);
+            } else {
+                var tagName = element.get(0).tagName;
+                if (['IMG'].indexOf(tagName) < 0) {
+                    if (element.children().length === 0) {
+                        // no contenteditable and no children -> create default child
+                        var editableElement = $(commands.editableElement);
+                        editableElement.text("span");
+                        element.append(editableElement);
+                        element = editableElement;
+                        self.assignHandlers(element);
                     }
-                } else {
-                    //if(self.element.get(0).tagName === 'SPAN' || self.element.text()===""){
-                    /* if (self.element.children().length === 0) {
-                         var editableElement = $(commands.editableElement);
-                         editableElement.text("span");
-                         self.element.append(editableElement);
-                         self.assignHandlers(self.element);
-                         self.element.focus();
-                         self.element.css("outline", self.outlineFocus);
-                     }*/
                 }
-
-                // add element to nav stack
-                this.navStack.navigate(self.element);
-
-                // scroll window
-                self.scrollWindow();
-
             }
+
+            // set new element
+            self.element = element;
+
+            // set focus 
+            self.setFocus();
+
+            // draw outline
+            self.element.css("outline", self.outlineFocus);
+
+            // add element to nav stack
+            this.navStack.navigate(self.element);
+
+            // scroll window
+            self.scrollWindow();
+
+            // update toolbar
+            self.updateToolbar();
+
+        },
+
+        // ---------------------------------------------------------------------
+        // set focus
+        // ---------------------------------------------------------------------
+        setFocus: function () {
+            var self = this;
+            if (self.element.attr("contenteditable") === "true") {
+                self.element.focus();
+            } else {
+                var childContentEditables = self.element.find('[contenteditable=true]');
+                if (childContentEditables.length > 0) {
+                    childContentEditables.get(0).focus();
+                } else {
+                    self.element.focus();
+                }
+            }
+        },
+
+        // ---------------------------------------------------------------------
+        // update toolbar
+        // ---------------------------------------------------------------------
+        updateToolbar: function () {
+            var self = this;
+            var path = self.getPath();
+            self.statusSpan.text(path);
+            self.statusSpan.attr("title", path);
+            self.cssInput.val(self.getCss());
 
         },
 
@@ -592,6 +630,7 @@
 
             // get visible area (make a little bit smaller to ensure that element will be visible)
             var y1 = $(window).scrollTop() + marginTop;
+            var y2 = $(window).scrollTop() + $(window).height();
 
             // get position of current element
             var coords = this.element.offset();
@@ -600,6 +639,9 @@
 
             // adjust window scroll position to make element visible
             if (y < y1) {
+                window.scrollTo(x, y - marginTop);
+            }
+            if (y > y2) {
                 window.scrollTo(x, y - marginTop);
             }
 
