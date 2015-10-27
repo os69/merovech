@@ -630,7 +630,8 @@
 
             // get visible area (make a little bit smaller to ensure that element will be visible)
             var y1 = $(window).scrollTop() + marginTop;
-            var y2 = $(window).scrollTop() + $(window).height();
+            //var y2 = $(window).scrollTop() + $(window).height();
+            var y2 = y1 + 400;
 
             // get position of current element
             var coords = this.element.offset();
