@@ -59,7 +59,7 @@
             if (depth === 0 && !first) {
                 return $(element);
             }
-            if (element.children.length > 0 && !first) {
+            if (element.getAttribute('contenteditable') !== 'true' && element.children.length > 0 && !first) {
                 if (direction === 'next') {
                     element = element.children.item(0);
                 } else {
@@ -1059,6 +1059,12 @@
                 alert("duplicate command name " + command.prototype.name);
             }
             module.commandByName[command.prototype.name] = command;
+        }
+
+        // list of command names
+        module.commandNames = [];
+        for (key in module.commandByName) {
+            module.commandNames.push(key);
         }
 
     };
