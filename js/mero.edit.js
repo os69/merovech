@@ -17,6 +17,12 @@
     var core = global.mero.core;
     var commands = global.mero.commands;
 
+
+    window.onpopstate = function (e) {
+        var pageName = core.url().parameter("page");
+        window.mero.edit.editorSingleton.loadPage(pageName);
+    };
+
     // =========================================================================
     // bootstrap
     // =========================================================================
